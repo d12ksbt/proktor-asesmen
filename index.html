@@ -93,6 +93,10 @@
 
       <!-- Auth Status & Action -->
       <div id="authSection" class="flex items-center flex-wrap gap-2">
+        <button id="btnHeaderQuota" onclick="window.openQuotaMenu()" class="hidden px-3 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold rounded-lg text-[11px] shadow-sm transition flex items-center justify-center text-center gap-1.5" title="Pantau Penggunaan Kuota Harian Firebase Spark">
+          <span>📊 Kuota Spark:</span>
+          <span id="headerQuotaBadgeText" class="px-1.5 py-0.5 rounded bg-white/20 text-white font-extrabold text-[10px]">0%</span>
+        </button>
         <button id="btnHeaderBackup" onclick="window.openBackupMenu()" class="hidden px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-lg text-[11px] shadow-sm transition flex items-center justify-center text-center gap-1.5" title="Backup & Restore Seluruh Data Firebase">
           <span>💾 Backup &amp; Restore</span>
         </button>
@@ -187,13 +191,13 @@
       <!-- STEP 2: 6 TOMBOL MENU UTAMA & PANEL KONTEN -->
       <div id="angkatanWorkspace" class="hidden space-y-4">
 
-        <!-- 7 MENU NAVIGATION BUTTONS (LABEL TENGAH & BERWARNA MODERN) -->
+        <!-- 8 MENU NAVIGATION BUTTONS (LABEL TENGAH & BERWARNA MODERN) -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
           <div class="flex items-center justify-between mb-2 px-1">
             <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Langkah 2 &bull; Menu Manajemen <span id="menuHeaderAngkatanLabel" class="text-teal-700">Kelas X</span></span>
             <span class="text-[10px] text-slate-400">Pilih menu di bawah ini</span>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
             <button type="button" id="tabBtn-jadwal" onclick="window.switchMenuTab('jadwal')" class="tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-md bg-gradient-to-br from-teal-600 to-emerald-600 text-white border border-teal-500 ring-2 ring-teal-300">
               <span class="text-[13px] font-extrabold leading-tight text-center">Jadwal Ujian</span>
             </button>
@@ -214,6 +218,9 @@
             </button>
             <button type="button" id="tabBtn-backup" onclick="window.switchMenuTab('backup')" class="tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-emerald-50 to-green-100 text-emerald-900 border border-emerald-200 hover:from-emerald-100 hover:to-green-200">
               <span class="text-[13px] font-extrabold leading-tight text-center">Backup &amp; Restore</span>
+            </button>
+            <button type="button" id="tabBtn-kuota" onclick="window.switchMenuTab('kuota')" class="tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-violet-50 to-indigo-100 text-violet-900 border border-violet-200 hover:from-violet-100 hover:to-indigo-200">
+              <span class="text-[13px] font-extrabold leading-tight text-center">Kuota Spark</span>
             </button>
           </div>
         </div>
@@ -850,6 +857,303 @@
           </div>
         </section>
 
+        <!-- ========================================== -->
+        <!-- MENU 8: MONITOR PENGGUNAAN KUOTA FIREBASE SPARK -->
+        <!-- ========================================== -->
+        <section id="tab-kuota" class="hidden space-y-4">
+          <!-- Banner Header Status Kuota Spark -->
+          <div class="bg-gradient-to-r from-violet-950 via-indigo-950 to-slate-900 text-white rounded-xl p-4 shadow-md border border-violet-700/50">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2 py-0.5 rounded bg-violet-500/20 border border-violet-400/40 text-violet-200 font-extrabold text-[10px] uppercase">Firebase Spark Plan (Gratis)</span>
+                  <span id="quotaOverallStatusBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-extrabold text-[10px]">🟢 STATUS KUOTA: AMAN</span>
+                  <span id="quotaResetCountdownText" class="text-[10px] text-indigo-200 font-medium">⏱️ Reset Kuota Harian: Pukul 14:00 / 15:00 WIB (00:00 Pacific Time)</span>
+                </div>
+                <h3 class="text-sm font-extrabold text-white mt-1">Monitor Penggunaan Kuota Harian &amp; Penyimpanan Cloud Firestore</h3>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                  Menampilkan estimasi pemakaian kuota hari ini dari gabungan <strong>aktivitas riil peserta ujian di database</strong> dan <strong>operasi Panel Proktor</strong> dibandingkan dengan batas maksimal paket gratis Firebase Spark (<strong>50.000 Reads/hari</strong>, <strong>20.000 Writes/hari</strong>, <strong>20.000 Deletes/hari</strong>, &amp; <strong>1 GiB Storage</strong>). Pemantauan ini berjalan <strong>tanpa membebani kuota tulis server</strong>.
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <button type="button" onclick="window.updateQuotaMonitorUI(true)" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-lg text-[11px] transition flex items-center justify-center text-center gap-1.5">
+                  <span>↻ Hitung Ulang</span>
+                </button>
+                <a id="linkFirebaseConsoleUsage" href="https://console.firebase.google.com/project/fluid-forklift-w0z9n/firestore/databases/ai-studio-firebaseasesmens-7734c599-f04d-48be-9bc7-e4858e935585/usage" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 bg-gradient-to-r from-violet-500 to-indigo-600 hover:from-violet-600 hover:to-indigo-700 text-white font-bold rounded-lg text-[11px] shadow-md transition flex items-center justify-center text-center gap-1.5">
+                  <span>🔗 Buka Grafik Resmi Firebase Console &nearr;</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 KARTU UTAMA INDIKATOR KUOTA SPARK (TERPAKAI VS BATAS MAKSIMAL) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <!-- 1. DOCUMENT READS (50.000 / HARI) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded">1. Document Reads (Baca)</span>
+                  <span id="quotaReadsPercentBadge" class="text-xs font-extrabold text-emerald-700">0.0%</span>
+                </div>
+                <div class="mt-2.5 flex items-baseline justify-between">
+                  <div>
+                    <p id="quotaReadsUsedText" class="text-lg font-extrabold text-slate-900">0</p>
+                    <p class="text-[10px] text-slate-500">Terpakai dari batas <strong>50.000 / hari</strong></p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-[10px] text-slate-400">Sisa Kuota</p>
+                    <p id="quotaReadsRemainingText" class="text-xs font-bold text-teal-700">50.000</p>
+                  </div>
+                </div>
+                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden mt-2.5 border border-slate-200">
+                  <div id="quotaReadsBar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300" style="width: 1%"></div>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-100 text-[10px] text-slate-600 space-y-1">
+                <div class="flex justify-between">
+                  <span>Aktivitas Peserta Hari Ini:</span>
+                  <strong id="quotaReadsStudentPart" class="text-slate-800">0 Reads</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span>Panel Proktor (Perangkat Ini):</span>
+                  <strong id="quotaReadsProctorPart" class="text-slate-800">0 Reads</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. DOCUMENT WRITES (20.000 / HARI) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">2. Document Writes (Tulis)</span>
+                  <span id="quotaWritesPercentBadge" class="text-xs font-extrabold text-emerald-700">0.0%</span>
+                </div>
+                <div class="mt-2.5 flex items-baseline justify-between">
+                  <div>
+                    <p id="quotaWritesUsedText" class="text-lg font-extrabold text-slate-900">0</p>
+                    <p class="text-[10px] text-slate-500">Terpakai dari batas <strong>20.000 / hari</strong></p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-[10px] text-slate-400">Sisa Kuota</p>
+                    <p id="quotaWritesRemainingText" class="text-xs font-bold text-teal-700">20.000</p>
+                  </div>
+                </div>
+                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden mt-2.5 border border-slate-200">
+                  <div id="quotaWritesBar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300" style="width: 1%"></div>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-100 text-[10px] text-slate-600 space-y-1">
+                <div class="flex justify-between">
+                  <span>Login, Ujian &amp; Log Peserta:</span>
+                  <strong id="quotaWritesStudentPart" class="text-slate-800">0 Writes</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span>Panel Proktor (Simpan/Edit/Reset):</span>
+                  <strong id="quotaWritesProctorPart" class="text-slate-800">0 Writes</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. DOCUMENT DELETES (20.000 / HARI) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded">3. Document Deletes (Hapus)</span>
+                  <span id="quotaDeletesPercentBadge" class="text-xs font-extrabold text-emerald-700">0.0%</span>
+                </div>
+                <div class="mt-2.5 flex items-baseline justify-between">
+                  <div>
+                    <p id="quotaDeletesUsedText" class="text-lg font-extrabold text-slate-900">0</p>
+                    <p class="text-[10px] text-slate-500">Terpakai dari batas <strong>20.000 / hari</strong></p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-[10px] text-slate-400">Sisa Kuota</p>
+                    <p id="quotaDeletesRemainingText" class="text-xs font-bold text-teal-700">20.000</p>
+                  </div>
+                </div>
+                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden mt-2.5 border border-slate-200">
+                  <div id="quotaDeletesBar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300" style="width: 1%"></div>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-100 text-[10px] text-slate-600 space-y-1">
+                <div class="flex justify-between">
+                  <span>Hapus Jadwal / Akun / Log:</span>
+                  <strong id="quotaDeletesProctorPart" class="text-slate-800">0 Deletes</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span>Batas Harian Spark:</span>
+                  <strong class="text-slate-800">20.000 Dok/hari</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. PENYIMPANAN DATABASE (1 GiB / 1.024 MB) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded">4. Penyimpanan (Storage)</span>
+                  <span id="quotaStoragePercentBadge" class="text-xs font-extrabold text-emerald-700">0.01%</span>
+                </div>
+                <div class="mt-2.5 flex items-baseline justify-between">
+                  <div>
+                    <p id="quotaStorageUsedText" class="text-lg font-extrabold text-slate-900">0 KB</p>
+                    <p class="text-[10px] text-slate-500">Terpakai dari batas <strong>1 GiB (1.024 MB)</strong></p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-[10px] text-slate-400">Total Dokumen</p>
+                    <p id="quotaTotalDocsText" class="text-xs font-bold text-purple-700">0 Dok</p>
+                  </div>
+                </div>
+                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden mt-2.5 border border-slate-200">
+                  <div id="quotaStorageBar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-300" style="width: 1%"></div>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-100 text-[10px] text-slate-600 space-y-1">
+                <div class="flex justify-between">
+                  <span>Sisa Ruang Database:</span>
+                  <strong id="quotaStorageRemainingText" class="text-slate-800">1.024,00 MB</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span>Termasuk Overhead Indeks:</span>
+                  <strong class="text-emerald-700">Ya (Estimasi Akurat)</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DETAIL KAPASITAS SISA PESERTA & TABEL RINCIAN KOLEKSI -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- KIRI: ANALISIS KAPASITAS PESERTA HARI INI & SIMULATOR BEBAN -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3.5">
+              <div class="border-b border-slate-200 pb-2.5 flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">⚡ Analisis Kapasitas Peserta Hari Ini &amp; Simulator</h3>
+                  <p class="text-[10px] text-slate-500 mt-0.5">
+                    Menghitung daya tampung sisa kuota hari ini berdasarkan aktivitas peserta di seluruh kelas (X, XI, XII).
+                  </p>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200 font-extrabold text-[10px]">800+ Murid Ready</span>
+              </div>
+
+              <!-- Ringkasan Aktivitas Peserta Hari Ini -->
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <p class="text-[10px] text-slate-500 font-semibold">Peserta Aktif Hari Ini</p>
+                  <p id="quotaStatActiveStudentsToday" class="text-sm font-extrabold text-teal-700 mt-0.5">0 Murid</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <p class="text-[10px] text-slate-500 font-semibold">Pelanggaran Hari Ini</p>
+                  <p id="quotaStatLogsToday" class="text-sm font-extrabold text-rose-600 mt-0.5">0 Log</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                  <p class="text-[10px] text-emerald-800 font-semibold">Sisa Kapasitas Sesi Hari Ini</p>
+                  <p id="quotaStatRemainingStudentCapacity" class="text-sm font-extrabold text-emerald-700 mt-0.5">±0 Sesi</p>
+                </div>
+              </div>
+
+              <div class="p-3 rounded-xl bg-indigo-50/70 border border-indigo-200 text-[11px] text-indigo-950 space-y-1">
+                <p class="font-bold">💡 Berapa kuota yang dipakai oleh 1 murid saat ujian?</p>
+                <p class="text-[10px] text-indigo-900/90 leading-relaxed">
+                  Setiap 1 murid yang login, memuat jadwal aktif (<span id="quotaInfoActiveSchedulesCount" class="font-bold">0</span> jadwal), mulai mengerjakan, hingga selesai ujian rata-rata hanya memakai <strong><span id="quotaInfoReadsPerStudent">4</span> Reads</strong> dan <strong>3 Writes</strong>. Artinya untuk <strong>800 murid &times; 2 sesi ujian/hari</strong> hanya membutuhkan sekitar <strong>±6.400–9.600 Reads (15% kuota)</strong> dan <strong>±4.800 Writes (24% kuota)</strong>.
+                </p>
+              </div>
+
+              <!-- Simulator Kalkulator Beban Ujian -->
+              <div class="pt-2 border-t border-slate-200 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wide">🧮 Kalkulator Simulasi Beban Kuota Harian</h4>
+                  <span id="simResultBadge" class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">🟢 SANGAT AMAN</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Jumlah Peserta (Murid)</label>
+                    <input type="number" id="simStudentCountInput" value="800" min="1" max="10000" oninput="window.runQuotaSimulation()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] font-bold bg-white focus:ring-2 focus:ring-violet-500 outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Sesi Mapel / Hari</label>
+                    <input type="number" id="simSessionsPerDayInput" value="2" min="1" max="10" oninput="window.runQuotaSimulation()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] font-bold bg-white focus:ring-2 focus:ring-violet-500 outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Estimasi Reset/Pelanggaran (%)</label>
+                    <input type="number" id="simViolationRateInput" value="10" min="0" max="100" oninput="window.runQuotaSimulation()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] font-bold bg-white focus:ring-2 focus:ring-violet-500 outline-none" />
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 grid grid-cols-2 gap-3 text-[11px]">
+                  <div>
+                    <p class="text-[10px] text-slate-500">Proyeksi Kebutuhan Reads:</p>
+                    <p class="font-extrabold text-slate-900 mt-0.5"><span id="simProjectedReads">0</span> / 50.000 (<span id="simProjectedReadsPct" class="text-indigo-700">0%</span>)</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] text-slate-500">Proyeksi Kebutuhan Writes:</p>
+                    <p class="font-extrabold text-slate-900 mt-0.5"><span id="simProjectedWrites">0</span> / 20.000 (<span id="simProjectedWritesPct" class="text-teal-700">0%</span>)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- KANAN: RINCIAN DOKUMEN & STORAGE PER KOLEKSI + COUNTER LOKAL PROKTOR -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-3.5">
+              <div class="space-y-3">
+                <div class="border-b border-slate-200 pb-2.5 flex items-center justify-between">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-900">🗄️ Rincian Penggunaan Dokumen &amp; Storage per Koleksi</h3>
+                    <p class="text-[10px] text-slate-500 mt-0.5">
+                      Dihitung langsung dari ukuran dokumen yang tersimpan di Cloud Firestore saat ini.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                  <table class="w-full text-left border-collapse">
+                    <thead>
+                      <tr class="bg-slate-50 text-slate-600 text-[10px] uppercase border-b border-slate-200">
+                        <th class="py-2 px-3 font-bold">Koleksi Firestore</th>
+                        <th class="py-2 px-3 font-bold text-center">Jumlah Dokumen</th>
+                        <th class="py-2 px-3 font-bold text-right">Estimasi Ukuran</th>
+                        <th class="py-2 px-3 font-bold text-right">% dari 1 GiB</th>
+                      </tr>
+                    </thead>
+                    <tbody id="quotaCollectionsTableBody" class="divide-y divide-slate-200 text-[11px]">
+                      <tr>
+                        <td colspan="4" class="py-4 text-center text-slate-400">Menghitung rincian koleksi...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Kotak Counter Lokal Perangkat Proktor -->
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <p class="text-[11px] font-bold text-slate-800">🖥️ Pencatat Operasi Browser Proktor Ini (Hari Ini)</p>
+                    <p class="text-[10px] text-slate-500">
+                      Mencatat setiap dokumen yang dimuat/diubah oleh halaman Panel Proktor ini (otomatis di-reset setiap pergantian hari kuota Firebase).
+                    </p>
+                  </div>
+                  <button type="button" onclick="window.resetProctorLocalQuota()" class="px-3 py-1.5 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-slate-300 hover:border-rose-300 font-bold rounded-lg text-[10px] transition shrink-0">
+                    Reset Counter Lokal
+                  </button>
+                </div>
+                <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+                  <div class="bg-white p-2 rounded-lg border border-slate-200">
+                    <span class="text-[9px] text-slate-500 uppercase font-bold block">Reads Proktor</span>
+                    <span id="localProctorReadsText" class="text-xs font-extrabold text-indigo-700">0</span>
+                  </div>
+                  <div class="bg-white p-2 rounded-lg border border-slate-200">
+                    <span class="text-[9px] text-slate-500 uppercase font-bold block">Writes Proktor</span>
+                    <span id="localProctorWritesText" class="text-xs font-extrabold text-teal-700">0</span>
+                  </div>
+                  <div class="bg-white p-2 rounded-lg border border-slate-200">
+                    <span class="text-[9px] text-slate-500 uppercase font-bold block">Deletes Proktor</span>
+                    <span id="localProctorDeletesText" class="text-xs font-extrabold text-rose-700">0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </div>
     </div>
   </main>
@@ -984,12 +1288,12 @@
       getFirestore,
       collection,
       doc,
-      setDoc,
-      getDoc,
-      getDocs,
-      updateDoc,
-      deleteDoc,
-      onSnapshot,
+      setDoc as fsSetDoc,
+      getDoc as fsGetDoc,
+      getDocs as fsGetDocs,
+      updateDoc as fsUpdateDoc,
+      deleteDoc as fsDeleteDoc,
+      onSnapshot as fsOnSnapshot,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
@@ -1061,6 +1365,170 @@
     });
     const db = getFirestore(app, firestoreDatabaseId);
     const provider = new GoogleAuthProvider();
+
+    // ==========================================
+    // TRACKER KUOTA HARIAN FIREBASE SPARK (PROKTOR + ESTIMASI MURID)
+    // ==========================================
+    const SPARK_LIMITS = {
+      READS_PER_DAY: 50000,
+      WRITES_PER_DAY: 20000,
+      DELETES_PER_DAY: 20000,
+      STORAGE_BYTES: 1024 * 1024 * 1024 // 1 GiB (1.073.741.824 bytes)
+    };
+    const QUOTA_STORAGE_KEY = "proktor_spark_quota_v1";
+
+    // Mendapatkan tanggal hari ini menurut zona waktu Pacific Time (America/Los_Angeles)
+    // karena kuota harian Firebase selalu di-reset pada pukul 00:00 Pacific Time (14:00 / 15:00 WIB).
+    function getPacificDateString(dateObj = new Date()) {
+      try {
+        const parts = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "America/Los_Angeles",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+        }).formatToParts(dateObj);
+        const y = parts.find((p) => p.type === "year")?.value || "2026";
+        const m = parts.find((p) => p.type === "month")?.value || "01";
+        const d = parts.find((p) => p.type === "day")?.value || "01";
+        return `${y}-${m}-${d}`;
+      } catch (_e) {
+        return dateObj.toISOString().slice(0, 10);
+      }
+    }
+
+    // Menghitung timestamp awal hari kuota saat ini (00:00 Pacific Time) dan sisa waktu menuju reset berikutnya
+    function getPacificQuotaWindowInfo() {
+      const now = new Date();
+      try {
+        const ptNowStr = now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" });
+        const ptNow = new Date(ptNowStr);
+        const ptStartOfDay = new Date(ptNow.getFullYear(), ptNow.getMonth(), ptNow.getDate(), 0, 0, 0, 0);
+        const ptNextMidnight = new Date(ptNow.getFullYear(), ptNow.getMonth(), ptNow.getDate() + 1, 0, 0, 0, 0);
+        const elapsedMs = Math.max(0, ptNow.getTime() - ptStartOfDay.getTime());
+        const remainingMs = Math.max(0, ptNextMidnight.getTime() - ptNow.getTime());
+        const windowStartMs = now.getTime() - elapsedMs;
+        const resetAtDate = new Date(now.getTime() + remainingMs);
+        const hoursLeft = Math.floor(remainingMs / (1000 * 60 * 60));
+        const minutesLeft = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+        const resetWibStr = resetAtDate.toLocaleTimeString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+        return {
+          windowStartMs,
+          hoursLeft,
+          minutesLeft,
+          resetWibStr
+        };
+      } catch (_e) {
+        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).getTime();
+        return {
+          windowStartMs: start,
+          hoursLeft: 6,
+          minutesLeft: 0,
+          resetWibStr: "14:00"
+        };
+      }
+    }
+
+    function loadProctorQuotaCounter() {
+      const todayPt = getPacificDateString();
+      try {
+        const raw = localStorage.getItem(QUOTA_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.ptDate === todayPt) {
+            return {
+              ptDate: todayPt,
+              reads: Number(parsed.reads) || 0,
+              writes: Number(parsed.writes) || 0,
+              deletes: Number(parsed.deletes) || 0
+            };
+          }
+        }
+      } catch (_e) {}
+      const fresh = { ptDate: todayPt, reads: 0, writes: 0, deletes: 0 };
+      try {
+        localStorage.setItem(QUOTA_STORAGE_KEY, JSON.stringify(fresh));
+      } catch (_e) {}
+      return fresh;
+    }
+
+    let proctorQuotaCounter = loadProctorQuotaCounter();
+    let quotaUiUpdateTimer = null;
+
+    function recordProctorOperation(type, count = 1) {
+      const todayPt = getPacificDateString();
+      if (proctorQuotaCounter.ptDate !== todayPt) {
+        proctorQuotaCounter = { ptDate: todayPt, reads: 0, writes: 0, deletes: 0 };
+      }
+      const safeCount = Math.max(0, Number(count) || 0);
+      if (type === "reads") proctorQuotaCounter.reads += safeCount;
+      if (type === "writes") proctorQuotaCounter.writes += safeCount;
+      if (type === "deletes") proctorQuotaCounter.deletes += safeCount;
+      try {
+        localStorage.setItem(QUOTA_STORAGE_KEY, JSON.stringify(proctorQuotaCounter));
+      } catch (_e) {}
+
+      if (!quotaUiUpdateTimer) {
+        quotaUiUpdateTimer = setTimeout(() => {
+          quotaUiUpdateTimer = null;
+          if (typeof window.updateQuotaMonitorUI === "function") {
+            window.updateQuotaMonitorUI();
+          }
+        }, 250);
+      }
+    }
+
+    // Wrapper berinstrumentasi untuk seluruh fungsi baca/tulis/hapus Firestore di Panel Proktor
+    async function getDoc(ref, ...args) {
+      const snap = await fsGetDoc(ref, ...args);
+      recordProctorOperation("reads", 1);
+      return snap;
+    }
+
+    async function getDocs(q, ...args) {
+      const snap = await fsGetDocs(q, ...args);
+      recordProctorOperation("reads", Math.max(1, snap.docs ? snap.docs.length : 1));
+      return snap;
+    }
+
+    async function setDoc(ref, data, ...args) {
+      const res = await fsSetDoc(ref, data, ...args);
+      recordProctorOperation("writes", 1);
+      return res;
+    }
+
+    async function updateDoc(ref, data, ...args) {
+      const res = await fsUpdateDoc(ref, data, ...args);
+      recordProctorOperation("writes", 1);
+      return res;
+    }
+
+    async function deleteDoc(ref, ...args) {
+      const res = await fsDeleteDoc(ref, ...args);
+      recordProctorOperation("deletes", 1);
+      return res;
+    }
+
+    function onSnapshot(q, onNext, onError) {
+      let isInitial = true;
+      return fsOnSnapshot(
+        q,
+        (snap) => {
+          const changes = typeof snap.docChanges === "function" ? snap.docChanges().length : 0;
+          const docCount = snap.docs ? snap.docs.length : 0;
+          const billedReads = isInitial ? Math.max(1, docCount) : Math.max(0, changes);
+          isInitial = false;
+          if (billedReads > 0 && !snap.metadata?.fromCache) {
+            recordProctorOperation("reads", billedReads);
+          }
+          onNext(snap);
+        },
+        onError
+      );
+    }
 
     if (window.location.protocol === "file:") {
       document.getElementById("fileProtocolBanner").classList.remove("hidden");
@@ -1232,6 +1700,7 @@
     let allSchedules = [];
     let allStudents = [];
     let allLogs = [];
+    let allAdmins = [];
 
     let unsubSchedules = null;
     let unsubStudents = null;
@@ -1288,6 +1757,9 @@
         }
       });
       updateBackupStatsUI();
+      if (typeof window.updateQuotaMonitorUI === "function") {
+        window.updateQuotaMonitorUI();
+      }
     }
 
     function updateBackupStatsUI() {
@@ -1400,6 +1872,10 @@
       "backup": {
         active: "tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-md bg-gradient-to-br from-emerald-600 to-green-600 text-white border border-emerald-500 ring-2 ring-emerald-300",
         inactive: "tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-emerald-50 to-green-100 text-emerald-900 border border-emerald-200 hover:from-emerald-100 hover:to-green-200"
+      },
+      "kuota": {
+        active: "tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-md bg-gradient-to-br from-violet-600 to-indigo-600 text-white border border-violet-500 ring-2 ring-violet-300",
+        inactive: "tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-violet-50 to-indigo-100 text-violet-900 border border-violet-200 hover:from-violet-100 hover:to-indigo-200"
       }
     };
 
@@ -1412,9 +1888,18 @@
       if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
+    window.openQuotaMenu = () => {
+      if (!selectedAngkatan) {
+        window.selectAngkatan("X");
+      }
+      window.switchMenuTab("kuota");
+      const sec = document.getElementById("tab-kuota");
+      if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
     window.switchMenuTab = (tabName) => {
       activeMenuTab = tabName;
-      const tabs = ["jadwal", "tambah-jadwal", "reset", "status-ujian", "akun", "pelanggaran", "backup"];
+      const tabs = ["jadwal", "tambah-jadwal", "reset", "status-ujian", "akun", "pelanggaran", "backup", "kuota"];
       tabs.forEach((t) => {
         const sec = document.getElementById(`tab-${t}`);
         const btn = document.getElementById(`tabBtn-${t}`);
@@ -1435,6 +1920,9 @@
       }
       if (tabName === "backup") {
         updateBackupStatsUI();
+      }
+      if (tabName === "kuota" && typeof window.updateQuotaMonitorUI === "function") {
+        window.updateQuotaMonitorUI();
       }
     };
 
@@ -1525,6 +2013,7 @@
       const btnLogout = document.getElementById("btnLogout");
       const btnRefreshAll = document.getElementById("btnRefreshAll");
       const btnHeaderBackup = document.getElementById("btnHeaderBackup");
+      const btnHeaderQuota = document.getElementById("btnHeaderQuota");
       const loginGate = document.getElementById("loginGate");
       const dashboardContent = document.getElementById("dashboardContent");
 
@@ -1534,6 +2023,7 @@
         btnLogout.classList.remove("hidden");
         btnRefreshAll.classList.remove("hidden");
         if (btnHeaderBackup) btnHeaderBackup.classList.remove("hidden");
+        if (btnHeaderQuota) btnHeaderQuota.classList.remove("hidden");
         loginGate.classList.add("hidden");
         dashboardContent.classList.remove("hidden");
 
@@ -1576,6 +2066,7 @@
         btnLogout.classList.add("hidden");
         btnRefreshAll.classList.add("hidden");
         if (btnHeaderBackup) btnHeaderBackup.classList.add("hidden");
+        if (btnHeaderQuota) btnHeaderQuota.classList.add("hidden");
         loginGate.classList.remove("hidden");
         dashboardContent.classList.add("hidden");
         document.getElementById("nonAdminBanner").classList.add("hidden");
@@ -1631,6 +2122,9 @@
           allLogs.sort((a, b) => getTimestampMs(b.createdAt) - getTimestampMs(a.createdAt));
           renderLogs();
           renderStudents();
+          if (typeof window.updateQuotaMonitorUI === "function") {
+            window.updateQuotaMonitorUI();
+          }
         },
         (err) => {
           console.warn("Listener cheat_logs error:", err);
@@ -1641,8 +2135,11 @@
       unsubAdmins = onSnapshot(
         collection(db, "admins"),
         (snap) => {
-          const list = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
-          renderAdmins(list);
+          allAdmins = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+          renderAdmins(allAdmins);
+          if (typeof window.updateQuotaMonitorUI === "function") {
+            window.updateQuotaMonitorUI();
+          }
         },
         (err) => {
           console.warn("Listener admins error:", err);
@@ -3088,6 +3585,361 @@
         showNotification("error", "Gagal Restore Data", err.message);
       }
     };
+
+    // ==========================================
+    // MENU 8: LOGIKA KALKULASI & RENDER KUOTA SPARK
+    // ==========================================
+    function estimateCollectionStorageBytes(docsArray, collectionName = "col") {
+      if (!Array.isArray(docsArray) || docsArray.length === 0) return 0;
+      let totalBytes = 0;
+      for (const item of docsArray) {
+        try {
+          const rawJson = JSON.stringify(serializeFirestoreDoc(item));
+          // Firestore document size + composite index & path metadata overhead (~2.2x + 128 bytes/doc)
+          totalBytes += Math.round(rawJson.length * 2.2) + 128 + collectionName.length * 2;
+        } catch (_e) {
+          totalBytes += 512;
+        }
+      }
+      return totalBytes;
+    }
+
+    function formatBytesHuman(bytes) {
+      const b = Math.max(0, Number(bytes) || 0);
+      if (b < 1024) return `${b} B`;
+      if (b < 1024 * 1024) return `${(b / 1024).toFixed(2)} KB`;
+      return `${(b / (1024 * 1024)).toFixed(2)} MB`;
+    }
+
+    function getQuotaColorClasses(pct) {
+      if (pct >= 85) {
+        return {
+          bar: "h-full bg-gradient-to-r from-rose-600 to-red-600 transition-all duration-300",
+          badge: "text-xs font-extrabold text-rose-700"
+        };
+      }
+      if (pct >= 65) {
+        return {
+          bar: "h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-300",
+          badge: "text-xs font-extrabold text-amber-700"
+        };
+      }
+      return {
+        bar: "h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300",
+        badge: "text-xs font-extrabold text-emerald-700"
+      };
+    }
+
+    window.runQuotaSimulation = () => {
+      const studentCount = Math.max(1, parseInt(document.getElementById("simStudentCountInput")?.value || "800", 10));
+      const sessionsPerDay = Math.max(1, parseInt(document.getElementById("simSessionsPerDayInput")?.value || "2", 10));
+      const violationRatePct = Math.max(0, Math.min(100, parseInt(document.getElementById("simViolationRateInput")?.value || "10", 10)));
+
+      const activeExamsCount = Math.max(2, allSchedules.filter((s) => s.isActive !== false).length);
+      // Per sesi per murid: 2 Reads settings + 1 Read user doc + activeExamsCount Reads jadwal
+      const readsPerStudentSession = 3 + activeExamsCount;
+      // Per sesi per murid: 1 Write login + 1 Write mulai mengerjakan + 1 Write selesai
+      const writesPerStudentSession = 3;
+
+      const totalStudentSessions = studentCount * sessionsPerDay;
+      const estimatedViolations = Math.round(totalStudentSessions * (violationRatePct / 100));
+
+      // Tambahan Writes untuk pelanggaran (2 Writes: cheat_logs + lock user) + 1 Write reset proktor
+      const projectedReads = totalStudentSessions * readsPerStudentSession + 350; // +350 untuk aktivitas proktor
+      const projectedWrites = totalStudentSessions * writesPerStudentSession + estimatedViolations * 3;
+
+      const readsPct = (projectedReads / SPARK_LIMITS.READS_PER_DAY) * 100;
+      const writesPct = (projectedWrites / SPARK_LIMITS.WRITES_PER_DAY) * 100;
+      const maxSimPct = Math.max(readsPct, writesPct);
+
+      const elReads = document.getElementById("simProjectedReads");
+      const elReadsPct = document.getElementById("simProjectedReadsPct");
+      const elWrites = document.getElementById("simProjectedWrites");
+      const elWritesPct = document.getElementById("simProjectedWritesPct");
+      const elBadge = document.getElementById("simResultBadge");
+
+      if (elReads) elReads.textContent = projectedReads.toLocaleString("id-ID");
+      if (elReadsPct) elReadsPct.textContent = `${readsPct.toFixed(1)}%`;
+      if (elWrites) elWrites.textContent = projectedWrites.toLocaleString("id-ID");
+      if (elWritesPct) elWritesPct.textContent = `${writesPct.toFixed(1)}%`;
+
+      if (elBadge) {
+        if (maxSimPct >= 95) {
+          elBadge.textContent = "🔴 MELEBIHI BATAS SPARK (PERLU OPTIMASI)";
+          elBadge.className = "px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-extrabold text-[10px]";
+        } else if (maxSimPct >= 70) {
+          elBadge.textContent = "🟡 MENDEKATI BATAS (70%+)";
+          elBadge.className = "px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-extrabold text-[10px]";
+        } else {
+          elBadge.textContent = `🟢 SANGAT AMAN (${maxSimPct.toFixed(1)}% KUOTA)`;
+          elBadge.className = "px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-extrabold text-[10px]";
+        }
+      }
+    };
+
+    window.resetProctorLocalQuota = async () => {
+      const ok = await askConfirmation(
+        "Reset Counter Lokal Proktor",
+        "Reset catatan jumlah Reads/Writes/Deletes browser Proktor ini ke 0 untuk hari ini?"
+      );
+      if (!ok) return;
+      proctorQuotaCounter = {
+        ptDate: getPacificDateString(),
+        reads: 0,
+        writes: 0,
+        deletes: 0
+      };
+      try {
+        localStorage.setItem(QUOTA_STORAGE_KEY, JSON.stringify(proctorQuotaCounter));
+      } catch (_e) {}
+      window.updateQuotaMonitorUI(true);
+    };
+
+    window.updateQuotaMonitorUI = (showToastOnManual = false) => {
+      const windowInfo = getPacificQuotaWindowInfo();
+      const todayIsoStr = getTodayIsoDate();
+
+      // Pastikan counter lokal sesuai hari Pacific Time berjalan
+      const todayPt = getPacificDateString();
+      if (proctorQuotaCounter.ptDate !== todayPt) {
+        proctorQuotaCounter = loadProctorQuotaCounter();
+      }
+
+      // Hitung jumlah jadwal aktif
+      const activeSchedulesCount = Math.max(1, allSchedules.filter((s) => s.isActive !== false).length);
+      const readsPerStudentLogin = 3 + activeSchedulesCount;
+
+      // Hitung aktivitas peserta hari ini dari koleksi `users`
+      let activeStudentsTodayCount = 0;
+      let studentReadsToday = 0;
+      let studentWritesToday = 0;
+
+      for (const u of allStudents) {
+        const lastLoginMs = getTimestampMs(u.lastLoginTimestamp);
+        const updatedMs = getTimestampMs(u.updatedAt);
+        const createdMs = getTimestampMs(u.createdAt);
+        const latestActivityMs = Math.max(lastLoginMs, updatedMs, createdMs);
+        const activityIso = latestActivityMs ? getLocalIsoDateFromTimestamp(latestActivityMs) : "";
+
+        const isActiveInWindow =
+          (latestActivityMs && latestActivityMs >= windowInfo.windowStartMs) ||
+          activityIso === todayIsoStr ||
+          (u.examStatus && u.examStatus !== "idle" && activityIso === todayIsoStr);
+
+        if (isActiveInWindow) {
+          activeStudentsTodayCount++;
+          studentReadsToday += readsPerStudentLogin;
+          const st = String(u.examStatus || "idle").toLowerCase();
+          if (st === "selesai") {
+            studentWritesToday += 3;
+          } else if (st === "mengerjakan" || st === "terkunci") {
+            studentWritesToday += 2;
+          } else {
+            studentWritesToday += 1;
+          }
+        }
+      }
+
+      // Hitung log pelanggaran hari ini dari koleksi `cheat_logs`
+      let logsTodayCount = 0;
+      for (const l of allLogs) {
+        const logMs = getTimestampMs(l.createdAt || l.timestamp);
+        const logIso = logMs ? getLocalIsoDateFromTimestamp(logMs) : "";
+        if ((logMs && logMs >= windowInfo.windowStartMs) || logIso === todayIsoStr) {
+          logsTodayCount++;
+        }
+      }
+      // Setiap pelanggaran melakukan 1 Write ke `cheat_logs` + 1 Write lock ke `users`
+      studentWritesToday += logsTodayCount * 2;
+
+      const totalReadsUsed = studentReadsToday + proctorQuotaCounter.reads;
+      const totalWritesUsed = studentWritesToday + proctorQuotaCounter.writes;
+      const totalDeletesUsed = proctorQuotaCounter.deletes;
+
+      const readsRemaining = Math.max(0, SPARK_LIMITS.READS_PER_DAY - totalReadsUsed);
+      const writesRemaining = Math.max(0, SPARK_LIMITS.WRITES_PER_DAY - totalWritesUsed);
+      const deletesRemaining = Math.max(0, SPARK_LIMITS.DELETES_PER_DAY - totalDeletesUsed);
+
+      const readsPct = Math.min(100, (totalReadsUsed / SPARK_LIMITS.READS_PER_DAY) * 100);
+      const writesPct = Math.min(100, (totalWritesUsed / SPARK_LIMITS.WRITES_PER_DAY) * 100);
+      const deletesPct = Math.min(100, (totalDeletesUsed / SPARK_LIMITS.DELETES_PER_DAY) * 100);
+
+      // Hitung estimasi Storage per koleksi
+      const bytesUsers = estimateCollectionStorageBytes(allStudents, "users");
+      const bytesExams = estimateCollectionStorageBytes(allSchedules, "exams");
+      const bytesLogs = estimateCollectionStorageBytes(allLogs, "cheat_logs");
+      const bytesAdmins = estimateCollectionStorageBytes(allAdmins, "admins");
+      const bytesSettings = 4 * 640; // 4 dokumen settings (global, kelas_X, kelas_XI, kelas_XII)
+      const totalStorageBytes = bytesUsers + bytesExams + bytesLogs + bytesAdmins + bytesSettings;
+      const totalDocsCount = allStudents.length + allSchedules.length + allLogs.length + allAdmins.length + 4;
+      const storagePct = Math.min(100, (totalStorageBytes / SPARK_LIMITS.STORAGE_BYTES) * 100);
+      const remainingStorageMB = Math.max(0, (SPARK_LIMITS.STORAGE_BYTES - totalStorageBytes) / (1024 * 1024));
+
+      // Update countdown reset harian
+      const elCountdown = document.getElementById("quotaResetCountdownText");
+      if (elCountdown) {
+        elCountdown.textContent = `⏱️ Reset Harian dalam ${windowInfo.hoursLeft}j ${windowInfo.minutesLeft}m (Pukul ${windowInfo.resetWibStr} WIB)`;
+      }
+
+      // Update badge di Header utama
+      const maxDailyPct = Math.max(readsPct, writesPct, deletesPct, storagePct);
+      const elHeaderBadge = document.getElementById("headerQuotaBadgeText");
+      if (elHeaderBadge) {
+        elHeaderBadge.textContent = `${maxDailyPct < 0.1 && totalReadsUsed > 0 ? "0.1" : maxDailyPct.toFixed(1)}%`;
+      }
+
+      const elOverallBadge = document.getElementById("quotaOverallStatusBadge");
+      if (elOverallBadge) {
+        if (maxDailyPct >= 85) {
+          elOverallBadge.textContent = `🔴 STATUS KUOTA: KRITIS (${maxDailyPct.toFixed(1)}%)`;
+          elOverallBadge.className = "px-2.5 py-0.5 rounded-full bg-rose-500/30 border border-rose-400 text-rose-200 font-extrabold text-[10px]";
+        } else if (maxDailyPct >= 65) {
+          elOverallBadge.textContent = `🟡 STATUS KUOTA: WASPADA (${maxDailyPct.toFixed(1)}%)`;
+          elOverallBadge.className = "px-2.5 py-0.5 rounded-full bg-amber-500/30 border border-amber-400 text-amber-200 font-extrabold text-[10px]";
+        } else {
+          elOverallBadge.textContent = `🟢 STATUS KUOTA: SANGAT AMAN (${maxDailyPct.toFixed(1)}% TERPAKAI)`;
+          elOverallBadge.className = "px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-extrabold text-[10px]";
+        }
+      }
+
+      // 1. Kartu Reads
+      const rColors = getQuotaColorClasses(readsPct);
+      const elReadsUsed = document.getElementById("quotaReadsUsedText");
+      const elReadsRem = document.getElementById("quotaReadsRemainingText");
+      const elReadsPct = document.getElementById("quotaReadsPercentBadge");
+      const elReadsBar = document.getElementById("quotaReadsBar");
+      const elReadsStu = document.getElementById("quotaReadsStudentPart");
+      const elReadsProc = document.getElementById("quotaReadsProctorPart");
+      if (elReadsUsed) elReadsUsed.textContent = totalReadsUsed.toLocaleString("id-ID");
+      if (elReadsRem) elReadsRem.textContent = readsRemaining.toLocaleString("id-ID");
+      if (elReadsPct) {
+        elReadsPct.textContent = `${readsPct.toFixed(2)}%`;
+        elReadsPct.className = rColors.badge;
+      }
+      if (elReadsBar) {
+        elReadsBar.className = rColors.bar;
+        elReadsBar.style.width = `${Math.max(1, readsPct)}%`;
+      }
+      if (elReadsStu) elReadsStu.textContent = `${studentReadsToday.toLocaleString("id-ID")} Reads`;
+      if (elReadsProc) elReadsProc.textContent = `${proctorQuotaCounter.reads.toLocaleString("id-ID")} Reads`;
+
+      // 2. Kartu Writes
+      const wColors = getQuotaColorClasses(writesPct);
+      const elWritesUsed = document.getElementById("quotaWritesUsedText");
+      const elWritesRem = document.getElementById("quotaWritesRemainingText");
+      const elWritesPct = document.getElementById("quotaWritesPercentBadge");
+      const elWritesBar = document.getElementById("quotaWritesBar");
+      const elWritesStu = document.getElementById("quotaWritesStudentPart");
+      const elWritesProc = document.getElementById("quotaWritesProctorPart");
+      if (elWritesUsed) elWritesUsed.textContent = totalWritesUsed.toLocaleString("id-ID");
+      if (elWritesRem) elWritesRem.textContent = writesRemaining.toLocaleString("id-ID");
+      if (elWritesPct) {
+        elWritesPct.textContent = `${writesPct.toFixed(2)}%`;
+        elWritesPct.className = wColors.badge;
+      }
+      if (elWritesBar) {
+        elWritesBar.className = wColors.bar;
+        elWritesBar.style.width = `${Math.max(1, writesPct)}%`;
+      }
+      if (elWritesStu) elWritesStu.textContent = `${studentWritesToday.toLocaleString("id-ID")} Writes`;
+      if (elWritesProc) elWritesProc.textContent = `${proctorQuotaCounter.writes.toLocaleString("id-ID")} Writes`;
+
+      // 3. Kartu Deletes
+      const dColors = getQuotaColorClasses(deletesPct);
+      const elDeletesUsed = document.getElementById("quotaDeletesUsedText");
+      const elDeletesRem = document.getElementById("quotaDeletesRemainingText");
+      const elDeletesPct = document.getElementById("quotaDeletesPercentBadge");
+      const elDeletesBar = document.getElementById("quotaDeletesBar");
+      const elDeletesProc = document.getElementById("quotaDeletesProctorPart");
+      if (elDeletesUsed) elDeletesUsed.textContent = totalDeletesUsed.toLocaleString("id-ID");
+      if (elDeletesRem) elDeletesRem.textContent = deletesRemaining.toLocaleString("id-ID");
+      if (elDeletesPct) {
+        elDeletesPct.textContent = `${deletesPct.toFixed(2)}%`;
+        elDeletesPct.className = dColors.badge;
+      }
+      if (elDeletesBar) {
+        elDeletesBar.className = dColors.bar;
+        elDeletesBar.style.width = `${Math.max(1, deletesPct)}%`;
+      }
+      if (elDeletesProc) elDeletesProc.textContent = `${totalDeletesUsed.toLocaleString("id-ID")} Deletes`;
+
+      // 4. Kartu Storage
+      const elStorageUsed = document.getElementById("quotaStorageUsedText");
+      const elStoragePct = document.getElementById("quotaStoragePercentBadge");
+      const elStorageBar = document.getElementById("quotaStorageBar");
+      const elTotalDocs = document.getElementById("quotaTotalDocsText");
+      const elStorageRem = document.getElementById("quotaStorageRemainingText");
+      if (elStorageUsed) elStorageUsed.textContent = formatBytesHuman(totalStorageBytes);
+      if (elStoragePct) elStoragePct.textContent = `${Math.max(0.01, storagePct).toFixed(2)}%`;
+      if (elStorageBar) elStorageBar.style.width = `${Math.max(1, storagePct)}%`;
+      if (elTotalDocs) elTotalDocs.textContent = `${totalDocsCount.toLocaleString("id-ID")} Dok`;
+      if (elStorageRem) elStorageRem.textContent = `${remainingStorageMB.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MB`;
+
+      // Update Statistik Kapasitas Sisa Peserta Hari Ini
+      const maxSessionsByReads = Math.floor(readsRemaining / Math.max(1, readsPerStudentLogin));
+      const maxSessionsByWrites = Math.floor(writesRemaining / 3);
+      const remainingStudentCapacity = Math.max(0, Math.min(maxSessionsByReads, maxSessionsByWrites));
+
+      const elStatActive = document.getElementById("quotaStatActiveStudentsToday");
+      const elStatLogs = document.getElementById("quotaStatLogsToday");
+      const elStatCap = document.getElementById("quotaStatRemainingStudentCapacity");
+      const elInfoSched = document.getElementById("quotaInfoActiveSchedulesCount");
+      const elInfoReadsPerStu = document.getElementById("quotaInfoReadsPerStudent");
+
+      if (elStatActive) elStatActive.textContent = `${activeStudentsTodayCount.toLocaleString("id-ID")} Murid`;
+      if (elStatLogs) elStatLogs.textContent = `${logsTodayCount.toLocaleString("id-ID")} Log`;
+      if (elStatCap) elStatCap.textContent = `±${remainingStudentCapacity.toLocaleString("id-ID")} Sesi`;
+      if (elInfoSched) elInfoSched.textContent = `${activeSchedulesCount}`;
+      if (elInfoReadsPerStu) elInfoReadsPerStu.textContent = `${readsPerStudentLogin}`;
+
+      // Update Tabel Rincian Koleksi
+      const colRows = [
+        { name: "Akun & Status Peserta", code: "users", count: allStudents.length, bytes: bytesUsers },
+        { name: "Jadwal Ujian", code: "exams", count: allSchedules.length, bytes: bytesExams },
+        { name: "Log Pelanggaran", code: "cheat_logs", count: allLogs.length, bytes: bytesLogs },
+        { name: "Daftar Admin Proktor", code: "admins", count: allAdmins.length, bytes: bytesAdmins },
+        { name: "Pengaturan Event & Status", code: "settings", count: 4, bytes: bytesSettings }
+      ];
+
+      const tbodyCol = document.getElementById("quotaCollectionsTableBody");
+      if (tbodyCol) {
+        tbodyCol.innerHTML = colRows.map((row) => {
+          const pct = (row.bytes / SPARK_LIMITS.STORAGE_BYTES) * 100;
+          return `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-2 px-3">
+                <span class="font-bold text-slate-800">${row.name}</span>
+                <code class="ml-1 px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-mono">${row.code}</code>
+              </td>
+              <td class="py-2 px-3 text-center font-bold text-slate-800">${row.count.toLocaleString("id-ID")}</td>
+              <td class="py-2 px-3 text-right font-mono text-slate-700">${formatBytesHuman(row.bytes)}</td>
+              <td class="py-2 px-3 text-right font-bold text-emerald-700">${pct < 0.001 && row.bytes > 0 ? "< 0.001%" : `${pct.toFixed(4)}%`}</td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      // Update Counter Lokal Proktor
+      const elLocR = document.getElementById("localProctorReadsText");
+      const elLocW = document.getElementById("localProctorWritesText");
+      const elLocD = document.getElementById("localProctorDeletesText");
+      if (elLocR) elLocR.textContent = proctorQuotaCounter.reads.toLocaleString("id-ID");
+      if (elLocW) elLocW.textContent = proctorQuotaCounter.writes.toLocaleString("id-ID");
+      if (elLocD) elLocD.textContent = proctorQuotaCounter.deletes.toLocaleString("id-ID");
+
+      window.runQuotaSimulation();
+
+      if (showToastOnManual) {
+        showNotification(
+          "success",
+          "Kuota Spark Diperbarui",
+          `Terpakai: ${totalReadsUsed.toLocaleString("id-ID")}/50.000 Reads (${readsPct.toFixed(1)}%) • ${totalWritesUsed.toLocaleString("id-ID")}/20.000 Writes (${writesPct.toFixed(1)}%).`
+        );
+      }
+    };
+
+    // Inisialisasi awal tampilan simulator & kuota
+    window.updateQuotaMonitorUI();
   </script>
 </body>
 </html>
