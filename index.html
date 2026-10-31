@@ -439,7 +439,12 @@
 
                 <div>
                   <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Nama Event Asesmen (<span id="labelEventAngkatan">Kelas X</span>)</label>
-                  <input type="text" id="settingAssessmentName" required placeholder="Contoh: ASESMEN SUMATIF AKHIR SEMESTER KELAS X" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-2 focus:ring-teal-500 outline-none" />
+                  <input type="text" id="settingAssessmentName" required placeholder="Contoh: ASESMEN SUMATIF AKHIR SEMESTER" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-2 focus:ring-teal-500 outline-none" />
+                </div>
+
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Tahun Pelajaran (<span id="labelYearAngkatan">Kelas X</span>)</label>
+                  <input type="text" id="settingEventYear" required placeholder="Contoh: Tahun Pelajaran 2025/2026" value="Tahun Pelajaran 2025/2026" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-2 focus:ring-teal-500 outline-none" />
                 </div>
 
                 <div>
@@ -464,17 +469,20 @@
                   <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50">
                     <p class="text-[10px] font-bold text-slate-500">Kelas X</p>
                     <p id="summaryStatus-X" class="text-xs font-extrabold text-slate-800 mt-0.5">Memuat...</p>
-                    <p id="summaryEvent-X" class="text-[10px] text-slate-500 truncate">-</p>
+                    <p id="summaryEvent-X" class="text-[10px] font-semibold text-slate-700 truncate mt-0.5">-</p>
+                    <p id="summaryYear-X" class="text-[9px] text-slate-500 truncate">-</p>
                   </div>
                   <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50">
                     <p class="text-[10px] font-bold text-slate-500">Kelas XI</p>
                     <p id="summaryStatus-XI" class="text-xs font-extrabold text-slate-800 mt-0.5">Memuat...</p>
-                    <p id="summaryEvent-XI" class="text-[10px] text-slate-500 truncate">-</p>
+                    <p id="summaryEvent-XI" class="text-[10px] font-semibold text-slate-700 truncate mt-0.5">-</p>
+                    <p id="summaryYear-XI" class="text-[9px] text-slate-500 truncate">-</p>
                   </div>
                   <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50">
                     <p class="text-[10px] font-bold text-slate-500">Kelas XII</p>
                     <p id="summaryStatus-XII" class="text-xs font-extrabold text-slate-800 mt-0.5">Memuat...</p>
-                    <p id="summaryEvent-XII" class="text-[10px] text-slate-500 truncate">-</p>
+                    <p id="summaryEvent-XII" class="text-[10px] font-semibold text-slate-700 truncate mt-0.5">-</p>
+                    <p id="summaryYear-XII" class="text-[9px] text-slate-500 truncate">-</p>
                   </div>
                 </div>
               </div>
@@ -1159,6 +1167,7 @@
       // Sync form Status Ujian per angkatan
       document.getElementById("settingTargetAngkatanDisplay").value = labelText;
       document.getElementById("labelEventAngkatan").textContent = labelText;
+      document.getElementById("labelYearAngkatan").textContent = labelText;
       document.getElementById("labelStatusAngkatan").textContent = labelText;
       document.getElementById("btnSaveStatusAngkatan").textContent = labelText;
 
@@ -2042,15 +2051,18 @@
         if (snap.exists()) {
           const data = snap.data();
           document.getElementById("settingAssessmentName").value = data.eventName || `ASESMEN SUMATIF KELAS ${selectedAngkatan}`;
+          document.getElementById("settingEventYear").value = data.eventYear || "Tahun Pelajaran 2025/2026";
           document.getElementById("settingAppStatus").value = data.statusUjian !== false ? "READY" : "MAINTENANCE";
         } else {
           const globalSnap = await getDoc(doc(db, "settings", "global"));
           if (globalSnap.exists()) {
             const gData = globalSnap.data();
             document.getElementById("settingAssessmentName").value = gData.eventName || `ASESMEN SUMATIF KELAS ${selectedAngkatan}`;
+            document.getElementById("settingEventYear").value = gData.eventYear || "Tahun Pelajaran 2025/2026";
             document.getElementById("settingAppStatus").value = gData.statusUjian !== false ? "READY" : "MAINTENANCE";
           } else {
             document.getElementById("settingAssessmentName").value = `ASESMEN SUMATIF KELAS ${selectedAngkatan}`;
+            document.getElementById("settingEventYear").value = "Tahun Pelajaran 2025/2026";
             document.getElementById("settingAppStatus").value = "READY";
           }
         }
@@ -2066,16 +2078,19 @@
           const snap = await getDoc(doc(db, "settings", `kelas_${kls}`));
           const statusEl = document.getElementById(`summaryStatus-${kls}`);
           const eventEl = document.getElementById(`summaryEvent-${kls}`);
+          const yearEl = document.getElementById(`summaryYear-${kls}`);
           if (snap.exists()) {
             const d = snap.data();
             const isReady = d.statusUjian !== false;
             statusEl.textContent = isReady ? "🟢 READY (Dibuka)" : "🟠 MAINTENANCE";
             statusEl.className = `text-xs font-extrabold mt-0.5 ${isReady ? "text-emerald-700" : "text-amber-700"}`;
             eventEl.textContent = d.eventName || "-";
+            if (yearEl) yearEl.textContent = d.eventYear || "Tahun Pelajaran 2025/2026";
           } else {
             statusEl.textContent = "🟢 READY (Default)";
             statusEl.className = "text-xs font-extrabold mt-0.5 text-emerald-700";
             eventEl.textContent = `Asesmen Kelas ${kls}`;
+            if (yearEl) yearEl.textContent = "Tahun Pelajaran 2025/2026";
           }
         } catch (_e) {
           // ignore
@@ -2088,6 +2103,7 @@
       if (!selectedAngkatan) return;
 
       const eventName = document.getElementById("settingAssessmentName").value.trim().slice(0, 150);
+      const eventYear = (document.getElementById("settingEventYear").value || "Tahun Pelajaran 2025/2026").trim().slice(0, 100);
       const statusMode = document.getElementById("settingAppStatus").value;
       const statusUjian = statusMode === "READY";
       const docId = `kelas_${selectedAngkatan}`;
@@ -2096,7 +2112,7 @@
         statusUjian,
         eventName,
         eventClass: `Kelas ${selectedAngkatan}`,
-        eventYear: "Tahun Pelajaran 2025/2026",
+        eventYear,
         updatedAt: serverTimestamp()
       };
 
@@ -2106,7 +2122,7 @@
         await setDoc(doc(db, "settings", "global"), payload);
         await window.loadAllClassSummary();
         stopLoading();
-        showNotification("success", `Status Kelas ${selectedAngkatan} Disimpan`, `Event "${eventName}" diatur ke ${statusMode}.`);
+        showNotification("success", `Status Kelas ${selectedAngkatan} Disimpan`, `Event "${eventName}" (${eventYear}) diatur ke ${statusMode}.`);
       } catch (err) {
         stopLoading();
         showNotification("error", "Gagal Menyimpan Status Ujian", err.message);
