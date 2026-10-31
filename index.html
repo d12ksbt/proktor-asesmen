@@ -72,7 +72,7 @@
         <strong class="font-extrabold uppercase tracking-wide">⚠️ Akun Belum Memiliki Hak Akses Admin Proktor</strong>
         <p class="mt-0.5 text-red-100">
           Anda login sebagai <strong id="nonAdminEmailText"></strong> (UID: <code id="nonAdminUidText" class="bg-red-800 px-1 py-0.5 rounded select-all"></code>).
-          Untuk menyimpan jadwal/mengelola peserta, silakan login menggunakan akun Admin Utama (<strong>niotron.project@gmail.com</strong>) atau daftarkan UID di atas pada menu <strong>Status Ujian &rarr; Daftar Admin Proktor</strong> menggunakan akun Admin Utama.
+          Silakan gunakan akun Google terverifikasi atau daftarkan UID di atas pada menu <strong>Status Ujian &rarr; Daftar Admin Proktor</strong>.
         </p>
       </div>
     </div>
@@ -184,7 +184,7 @@
       <!-- STEP 2: 6 TOMBOL MENU UTAMA & PANEL KONTEN -->
       <div id="angkatanWorkspace" class="hidden space-y-4">
 
-        <!-- 6 MENU NAVIGATION BUTTONS (LABEL TENGAH & BERWARna MODERN) -->
+        <!-- 6 MENU NAVIGATION BUTTONS (LABEL TENGAH & BERWARNA MODERN) -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
           <div class="flex items-center justify-between mb-2 px-1">
             <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Langkah 2 &bull; Menu Manajemen <span id="menuHeaderAngkatanLabel" class="text-teal-700">Kelas X</span></span>
@@ -310,7 +310,7 @@
                 <div>
                   <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Konsentrasi Keahlian *</label>
                   <select id="batchExamJurusan" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] font-bold bg-white focus:ring-2 focus:ring-teal-500 outline-none">
-                    <option value="ALL">Semua Konsentrasi (Umum)</option>
+                    <option value="SEMUA">Semua Konsentrasi (Umum)</option>
                     <option value="TO">TO (Teknik Otomotif)</option>
                     <option value="TPFL">TPFL (Teknik Pengelasan & Fabrikasi Logam)</option>
                     <option value="BUSANA">BUSANA (Desain & Produksi Busana)</option>
@@ -363,9 +363,10 @@
               <div class="flex flex-wrap items-center gap-2">
                 <select id="filterStateSelect" class="px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none">
                   <option value="ALL">Semua Status Sesi</option>
-                  <option value="LOCKED">🔒 Terkunci / Keluar Paksa</option>
-                  <option value="ACTIVE">🟢 Sedang Mengerjakan</option>
-                  <option value="FINISHED">✅ Selesai</option>
+                  <option value="terkunci">🔒 Terkunci / Keluar Paksa</option>
+                  <option value="mengerjakan">🟢 Sedang Mengerjakan</option>
+                  <option value="login">🔵 Sudah Login</option>
+                  <option value="selesai">✅ Selesai</option>
                 </select>
                 <button type="button" onclick="window.manualRefreshStudents()" class="px-3.5 py-1.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold rounded-lg text-[11px] shadow-sm transition flex items-center justify-center text-center gap-1">
                   <span>↻ Refresh</span>
@@ -393,7 +394,7 @@
                     <th class="py-2.5 px-3 font-bold">Nama & Username</th>
                     <th class="py-2.5 px-3 font-bold">Kelas</th>
                     <th class="py-2.5 px-3 font-bold">Status Sesi Ujian</th>
-                    <th class="py-2.5 px-3 font-bold">Jadwal Aktif</th>
+                    <th class="py-2.5 px-3 font-bold">Perangkat</th>
                     <th class="py-2.5 px-3 font-bold">Jumlah Pelanggaran</th>
                     <th class="py-2.5 px-3 font-bold text-center">Aksi Proktor</th>
                   </tr>
@@ -633,8 +634,8 @@
                     <th class="py-2.5 px-3 font-bold">Waktu</th>
                     <th class="py-2.5 px-3 font-bold">Nama Peserta</th>
                     <th class="py-2.5 px-3 font-bold">Kelas</th>
-                    <th class="py-2.5 px-3 font-bold">Jenis Pelanggaran</th>
-                    <th class="py-2.5 px-3 font-bold">ID Ujian</th>
+                    <th class="py-2.5 px-3 font-bold">Deskripsi Pelanggaran</th>
+                    <th class="py-2.5 px-3 font-bold">Mapel / Halaman</th>
                     <th class="py-2.5 px-3 font-bold text-center">Aksi</th>
                   </tr>
                 </thead>
@@ -688,7 +689,7 @@
           <div>
             <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Konsentrasi Keahlian *</label>
             <select id="modalExamJurusan" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none">
-              <option value="ALL">Semua Konsentrasi</option>
+              <option value="SEMUA">Semua Konsentrasi</option>
               <option value="TO">TO</option>
               <option value="TPFL">TPFL</option>
               <option value="BUSANA">BUSANA</option>
@@ -804,7 +805,8 @@
       getDocs,
       updateDoc,
       deleteDoc,
-      onSnapshot
+      onSnapshot,
+      serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
     // Disusun terpisah agar tidak memicu bot pemindai otomatis GitHub (GitHub Secret Scanning)
@@ -970,6 +972,70 @@
     }
 
     // ==========================================
+    // HELPER KONVERSI TANGGAL (YYYY-MM-DD <-> DD-MM-YYYY)
+    // ==========================================
+    function getTodayIsoDate() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function isoToDDMMYYYY(isoStr) {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(isoStr || "").trim());
+      if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+      const m2 = /^(\d{2})-(\d{2})-(\d{4})$/.exec(String(isoStr || "").trim());
+      if (m2) return `${m2[1]}-${m2[2]}-${m2[3]}`;
+      const today = getTodayIsoDate().split("-");
+      return `${today[2]}-${today[1]}-${today[0]}`;
+    }
+
+    function ddmmyyyyToIso(ddmmyyyyStr) {
+      const m = /^(\d{2})-(\d{2})-(\d{4})$/.exec(String(ddmmyyyyStr || "").trim());
+      if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+      const m2 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ddmmyyyyStr || "").trim());
+      if (m2) return `${m2[1]}-${m2[2]}-${m2[3]}`;
+      return getTodayIsoDate();
+    }
+
+    function formatIndonesianDateFromDDMMYYYY(ddmmyyyy) {
+      const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(String(ddmmyyyy || "").trim());
+      if (!match) return String(ddmmyyyy || "-");
+      const day = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10) - 1;
+      const year = parseInt(match[3], 10);
+      const dateObj = new Date(year, month, day);
+      if (isNaN(dateObj.getTime())) return String(ddmmyyyy);
+      const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+      const months = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+      return `${days[dateObj.getDay()]}, ${String(day).padStart(2, "0")} ${months[month]} ${year}`;
+    }
+
+    function detectAngkatanFromKelas(kelasStr, fallback = "X") {
+      const up = String(kelasStr || "").trim().toUpperCase();
+      const tokens = up.split(/[\s,\-/]+/);
+      if (tokens.includes("XII") || up.startsWith("XII")) return "XII";
+      if (tokens.includes("XI") || up.startsWith("XI")) return "XI";
+      if (tokens.includes("X") || up.startsWith("X")) return "X";
+      return fallback;
+    }
+
+    function detectJurusanFromKelas(kelasStr) {
+      const up = String(kelasStr || "").trim().toUpperCase();
+      const tokens = up.split(/[\s,\-/]+/);
+      for (const j of ["TJKT", "TO", "TPFL", "BUSANA"]) {
+        if (tokens.includes(j) || up.includes(j)) return j;
+      }
+      if (tokens.includes("TKJ")) return "TJKT";
+      if (tokens.includes("TKR") || tokens.includes("TBSM")) return "TO";
+      return "UMUM";
+    }
+
+    // ==========================================
     // STATE GLOBAL PANEL PROKTOR
     // ==========================================
     let selectedAngkatan = null; // 'X' | 'XI' | 'XII'
@@ -988,15 +1054,6 @@
     let unsubLogs = null;
     let unsubAdmins = null;
 
-    // Set default tanggal hari ini
-    function getTodayIsoDate() {
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, "0");
-      const dd = String(now.getDate()).padStart(2, "0");
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
     const todayIso = getTodayIsoDate();
     document.getElementById("batchDefaultDate").value = todayIso;
     document.getElementById("customLogDateInput").value = todayIso;
@@ -1007,52 +1064,40 @@
       year: "numeric"
     });
 
-    // Helper deteksi Angkatan (X / XI / XII) dari string kelas atau targetKelas
-    function matchAngkatan(rawStr, targetAngkatan) {
+    // Helper deteksi Angkatan (X / XI / XII)
+    function matchAngkatan(itemOrStr, targetAngkatan) {
       if (!targetAngkatan) return true;
-      const up = String(rawStr || "").trim().toUpperCase();
+      if (typeof itemOrStr === "object" && itemOrStr !== null) {
+        const angk = String(itemOrStr.angkatan || "").trim().toUpperCase();
+        if (angk === "SEMUA" || angk === "ALL") return true;
+        if (angk) return angk === targetAngkatan.toUpperCase();
+        return matchAngkatan(itemOrStr.kelas || itemOrStr.targetKelas || "", targetAngkatan);
+      }
+      const up = String(itemOrStr || "").trim().toUpperCase();
       if (!up || up === "ALL" || up === "SEMUA" || up === "SEMUA KELAS") return true;
       const tokens = up.split(/[\s,\-/]+/);
       return tokens.includes(targetAngkatan.toUpperCase());
     }
 
     // Helper deteksi Konsentrasi Keahlian (TO / TPFL / BUSANA / TJKT)
-    function matchJurusan(rawStr, targetJurusan) {
+    function matchJurusan(itemOrStr, targetJurusan) {
       if (!targetJurusan || targetJurusan === "ALL") return true;
-      const up = String(rawStr || "").trim().toUpperCase();
+      if (typeof itemOrStr === "object" && itemOrStr !== null) {
+        const jur = String(itemOrStr.jurusan || "").trim().toUpperCase();
+        if (jur === "SEMUA" || jur === "ALL" || jur === "UMUM") return true;
+        if (jur) return jur === targetJurusan.toUpperCase();
+        return matchJurusan(itemOrStr.kelas || itemOrStr.targetKelas || "", targetJurusan);
+      }
+      const up = String(itemOrStr || "").trim().toUpperCase();
       if (!up || up === "ALL" || up === "SEMUA") return true;
       const tokens = up.split(/[\s,\-/]+/);
       return tokens.includes(targetJurusan.toUpperCase()) || up.includes(targetJurusan.toUpperCase());
     }
 
-    function parseTargetKelasTokens(targetKelas) {
-      const up = String(targetKelas || "ALL").trim().toUpperCase();
-      let angkatan = "X";
-      if (up.split(/[\s,\-/]+/).includes("XII")) angkatan = "XII";
-      else if (up.split(/[\s,\-/]+/).includes("XI")) angkatan = "XI";
-      else if (up.split(/[\s,\-/]+/).includes("X")) angkatan = "X";
-
-      let jurusan = "ALL";
-      const jList = ["TO", "TPFL", "BUSANA", "TJKT"];
-      for (const j of jList) {
-        if (up.split(/[\s,\-/]+/).includes(j)) {
-          jurusan = j;
-          break;
-        }
-      }
-      return { angkatan, jurusan };
-    }
-
     function updateAngkatanCounters() {
       ["X", "XI", "XII"].forEach((kls) => {
-        const jCount = allSchedules.filter((s) => {
-          const up = String(s.targetKelas || "").trim().toUpperCase();
-          return up.split(/[\s,\-/]+/).includes(kls) || up === "ALL";
-        }).length;
-        const mCount = allStudents.filter((u) => {
-          const up = String(u.kelas || "").trim().toUpperCase();
-          return up.split(/[\s,\-/]+/).includes(kls);
-        }).length;
+        const jCount = allSchedules.filter((s) => matchAngkatan(s, kls)).length;
+        const mCount = allStudents.filter((u) => matchAngkatan(u, kls)).length;
         const badge = document.getElementById(`countAngkatan-${kls}`);
         if (badge) {
           badge.textContent = `${jCount} Jadwal • ${mCount} Murid`;
@@ -1081,7 +1126,6 @@
     window.selectAngkatan = (angkatan) => {
       selectedAngkatan = angkatan;
 
-      // Update tampilan tombol Angkatan
       ["X", "XI", "XII"].forEach((k) => {
         const btn = document.getElementById(`btnAngkatan-${k}`);
         if (!btn) return;
@@ -1110,6 +1154,7 @@
       const batchSelect = document.getElementById("batchExamAngkatan");
       batchSelect.value = angkatan;
       batchSelect.disabled = true;
+      renumberSessionRows();
 
       // Sync form Status Ujian per angkatan
       document.getElementById("settingTargetAngkatanDisplay").value = labelText;
@@ -1117,12 +1162,11 @@
       document.getElementById("labelStatusAngkatan").textContent = labelText;
       document.getElementById("btnSaveStatusAngkatan").textContent = labelText;
 
-      // Render semua tabel untuk angkatan terpilih
       renderSchedules();
       renderStudents();
       renderAccounts();
       renderLogs();
-      window.loadClassSettings();
+      window.loadClassSettings(true);
     };
 
     // ==========================================
@@ -1171,7 +1215,6 @@
         }
       });
 
-      // Pastikan dropdown kelas di Tambah Jadwal selalu terkunci ke selectedAngkatan
       if (tabName === "tambah-jadwal" && selectedAngkatan) {
         const batchSelect = document.getElementById("batchExamAngkatan");
         batchSelect.value = selectedAngkatan;
@@ -1279,6 +1322,10 @@
         document.getElementById("infoCurrentUid").textContent = user.uid;
         document.getElementById("infoCurrentEmail").textContent = user.email || "-";
 
+        const isGoogleVerified = Boolean(
+          user.emailVerified &&
+          (user.providerData || []).some((p) => p.providerId === "google.com")
+        );
         const isDefaultEmail = user.email && user.email.toLowerCase() === "niotron.project@gmail.com";
         let isRegisteredAdmin = false;
         try {
@@ -1289,7 +1336,7 @@
         }
 
         const nonAdminBanner = document.getElementById("nonAdminBanner");
-        if (!isDefaultEmail && !isRegisteredAdmin) {
+        if (!isGoogleVerified && !isDefaultEmail && !isRegisteredAdmin) {
           document.getElementById("nonAdminEmailText").textContent = user.email || "Tanpa Email";
           document.getElementById("nonAdminUidText").textContent = user.uid;
           nonAdminBanner.classList.remove("hidden");
@@ -1299,11 +1346,10 @@
 
         initRealtimeListeners();
 
-        // Otomatis pilih Kelas X jika belum ada angkatan yang dipilih
         if (!selectedAngkatan) {
           window.selectAngkatan("X");
         } else {
-          window.loadClassSettings();
+          window.loadClassSettings(true);
         }
         window.loadAllClassSummary();
       } else {
@@ -1326,37 +1372,82 @@
     }
 
     // ==========================================
-    // REAL-TIME LISTENERS & REFRESH
+    // REAL-TIME LISTENERS & REFRESH (KOLEKSI: exams, users, cheat_logs, admins)
     // ==========================================
     function initRealtimeListeners() {
       cleanupListeners();
 
-      // 1. Schedules
-      unsubSchedules = onSnapshot(collection(db, "schedules"), (snap) => {
-        allSchedules = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        updateAngkatanCounters();
-        renderSchedules();
-      });
+      // 1. Jadwal Ujian (Koleksi: exams)
+      unsubSchedules = onSnapshot(
+        collection(db, "exams"),
+        (snap) => {
+          allSchedules = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+          updateAngkatanCounters();
+          renderSchedules();
+        },
+        (err) => {
+          console.warn("Listener exams error:", err);
+        }
+      );
 
-      // 2. Users (Students)
-      unsubStudents = onSnapshot(collection(db, "users"), (snap) => {
-        allStudents = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
-        updateAngkatanCounters();
-        renderStudents();
-        renderAccounts();
-      });
+      // 2. Peserta Ujian (Koleksi: users)
+      unsubStudents = onSnapshot(
+        collection(db, "users"),
+        (snap) => {
+          allStudents = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+          updateAngkatanCounters();
+          renderStudents();
+          renderAccounts();
+        },
+        (err) => {
+          console.warn("Listener users error:", err);
+        }
+      );
 
-      // 3. Violation Logs
-      unsubLogs = onSnapshot(collection(db, "logs"), (snap) => {
-        allLogs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        allLogs.sort((a, b) => String(b.timestamp || "").localeCompare(String(a.timestamp || "")));
-        renderLogs();
-      });
+      // 3. Log Pelanggaran (Koleksi: cheat_logs)
+      unsubLogs = onSnapshot(
+        collection(db, "cheat_logs"),
+        (snap) => {
+          allLogs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+          allLogs.sort((a, b) => getTimestampMs(b.createdAt) - getTimestampMs(a.createdAt));
+          renderLogs();
+          renderStudents();
+        },
+        (err) => {
+          console.warn("Listener cheat_logs error:", err);
+        }
+      );
 
-      // 4. Admins
-      unsubAdmins = onSnapshot(collection(db, "admins"), (snap) => {
-        const list = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
-        renderAdmins(list);
+      // 4. Daftar Admin (Koleksi: admins)
+      unsubAdmins = onSnapshot(
+        collection(db, "admins"),
+        (snap) => {
+          const list = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+          renderAdmins(list);
+        },
+        (err) => {
+          console.warn("Listener admins error:", err);
+        }
+      );
+    }
+
+    function getTimestampMs(ts) {
+      if (!ts) return 0;
+      if (typeof ts.toMillis === "function") return ts.toMillis();
+      if (typeof ts.seconds === "number") return ts.seconds * 1000;
+      const parsed = new Date(ts).getTime();
+      return isNaN(parsed) ? 0 : parsed;
+    }
+
+    function formatTimestampDisplay(ts) {
+      const ms = getTimestampMs(ts);
+      if (!ms) return "-";
+      return new Date(ms).toLocaleString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
       });
     }
 
@@ -1366,14 +1457,14 @@
       startLoading("download-modal", "Menyegarkan Data...", "Mengunduh jadwal, peserta, status, dan log terbaru");
       try {
         const [schedSnap, userSnap, logSnap] = await Promise.all([
-          getDocs(collection(db, "schedules")),
+          getDocs(collection(db, "exams")),
           getDocs(collection(db, "users")),
-          getDocs(collection(db, "logs"))
+          getDocs(collection(db, "cheat_logs"))
         ]);
         allSchedules = schedSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
         allStudents = userSnap.docs.map((d) => ({ uid: d.id, ...d.data() }));
         allLogs = logSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        allLogs.sort((a, b) => String(b.timestamp || "").localeCompare(String(a.timestamp || "")));
+        allLogs.sort((a, b) => getTimestampMs(b.createdAt) - getTimestampMs(a.createdAt));
 
         updateAngkatanCounters();
         renderSchedules();
@@ -1396,7 +1487,7 @@
     window.manualRefreshSchedules = async () => {
       startLoading("download-modal", "Memuat Jadwal...", "Mengambil jadwal terbaru dari server");
       try {
-        const snap = await getDocs(collection(db, "schedules"));
+        const snap = await getDocs(collection(db, "exams"));
         allSchedules = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         updateAngkatanCounters();
         renderSchedules();
@@ -1427,9 +1518,9 @@
     window.manualRefreshLogs = async () => {
       startLoading("download-modal", "Memuat Log Pelanggaran...", "Mengambil riwayat pelanggaran terbaru");
       try {
-        const snap = await getDocs(collection(db, "logs"));
+        const snap = await getDocs(collection(db, "cheat_logs"));
         allLogs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        allLogs.sort((a, b) => String(b.timestamp || "").localeCompare(String(a.timestamp || "")));
+        allLogs.sort((a, b) => getTimestampMs(b.createdAt) - getTimestampMs(a.createdAt));
         renderLogs();
         stopLoading();
         showNotification("success", "Log Pelanggaran Diperbarui", "Data pelanggaran telah disinkronkan.");
@@ -1440,7 +1531,7 @@
     };
 
     // ==========================================
-    // MENU 1: RENDER JADWAL UJIAN & TOGGLE AKTIF
+    // MENU 1: RENDER JADWAL UJIAN & TOGGLE AKTIF (KOLEKSI: exams)
     // ==========================================
     document.getElementById("searchScheduleInput").addEventListener("input", renderSchedules);
 
@@ -1451,19 +1542,20 @@
       const keyword = (document.getElementById("searchScheduleInput").value || "").toLowerCase();
 
       const filtered = allSchedules.filter((s) => {
-        const matchKls = matchAngkatan(s.targetKelas, selectedAngkatan);
-        const matchJur = matchJurusan(s.targetKelas, jadwalJurusanFilter);
+        const matchKls = matchAngkatan(s, selectedAngkatan);
+        const matchJur = matchJurusan(s, jadwalJurusanFilter);
+        const mapel = s.mapel || s.subject || "";
         const matchSearch =
-          (s.subject || "").toLowerCase().includes(keyword) ||
+          mapel.toLowerCase().includes(keyword) ||
           (s.id || "").toLowerCase().includes(keyword) ||
           (s.token || "").toLowerCase().includes(keyword) ||
-          (s.targetKelas || "").toLowerCase().includes(keyword);
+          (s.jurusan || "").toLowerCase().includes(keyword);
         return matchKls && matchJur && matchSearch;
       });
 
       filtered.sort((a, b) => {
-        const da = `${a.date || ""} ${a.startTime || ""}`;
-        const db = `${b.date || ""} ${b.startTime || ""}`;
+        const da = `${ddmmyyyyToIso(a.examDate || a.date || "")} ${a.mulai || a.startTime || ""}`;
+        const db = `${ddmmyyyyToIso(b.examDate || b.date || "")} ${b.mulai || b.startTime || ""}`;
         return da.localeCompare(db);
       });
 
@@ -1481,8 +1573,17 @@
       }
 
       tbody.innerHTML = filtered.map((item) => {
-        const isActive = item.active !== false;
+        const isActive = item.isActive !== undefined ? Boolean(item.isActive) : item.active !== false;
         const safeId = escapeHtml(item.id);
+        const mapelLabel = escapeHtml(item.mapel || item.subject || "-");
+        const angkatanLabel = escapeHtml(item.angkatan || selectedAngkatan);
+        const jurusanLabel = escapeHtml(item.jurusan || "SEMUA");
+        const dateLabel = escapeHtml(item.hariTanggal || item.examDate || item.date || "-");
+        const startLabel = escapeHtml(item.mulai || item.startTime || "-");
+        const endLabel = escapeHtml(item.selesai || item.endTime || "-");
+        const tokenLabel = escapeHtml(item.token || "-");
+        const durasiLabel = item.durationMinutes || 90;
+
         return `
           <tr class="hover:bg-slate-50 transition">
             <td class="py-2.5 px-3">
@@ -1496,19 +1597,19 @@
               </button>
             </td>
             <td class="py-2.5 px-3">
-              <p class="font-bold text-slate-900 text-[11px]">${escapeHtml(item.subject)}</p>
+              <p class="font-bold text-slate-900 text-[11px]">${mapelLabel}</p>
               <p class="text-[10px] font-mono text-slate-400">${safeId}</p>
             </td>
             <td class="py-2.5 px-3">
-              <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded font-bold text-[10px]">${escapeHtml(item.targetKelas || `Kelas ${selectedAngkatan}`)}</span>
+              <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded font-bold text-[10px]">Kelas ${angkatanLabel} &bull; ${jurusanLabel}</span>
             </td>
             <td class="py-2.5 px-3 text-[11px]">
-              <p class="font-semibold text-slate-800">${escapeHtml(item.date || "-")}</p>
-              <p class="text-[10px] text-slate-500">${escapeHtml(item.startTime || "-")} - ${escapeHtml(item.endTime || "-")}</p>
+              <p class="font-semibold text-slate-800">${dateLabel}</p>
+              <p class="text-[10px] text-slate-500">${startLabel} - ${endLabel}</p>
             </td>
             <td class="py-2.5 px-3">
-              <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded font-mono font-extrabold text-[10px]">${escapeHtml(item.token)}</span>
-              <span class="text-[10px] text-slate-500 ml-1">${item.durationMinutes || 60} mnt</span>
+              <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded font-mono font-extrabold text-[10px]">${tokenLabel}</span>
+              <span class="text-[10px] text-slate-500 ml-1">${durasiLabel} mnt</span>
             </td>
             <td class="py-2.5 px-3 text-center">
               <div class="flex items-center justify-center gap-1.5">
@@ -1524,7 +1625,10 @@
     window.toggleScheduleActive = async (id, nextActiveState) => {
       startLoading("upload", "Mengubah Status Jadwal...", `${id} -> ${nextActiveState ? "AKTIF" : "NONAKTIF"}`);
       try {
-        await updateDoc(doc(db, "schedules", id), { active: nextActiveState });
+        await updateDoc(doc(db, "exams", id), {
+          isActive: Boolean(nextActiveState),
+          updatedAt: serverTimestamp()
+        });
         stopLoading();
         showNotification("success", "Status Jadwal Diperbarui", `Jadwal ${id} sekarang ${nextActiveState ? "AKTIF" : "NONAKTIF"}.`);
       } catch (err) {
@@ -1537,19 +1641,18 @@
       const item = allSchedules.find((s) => s.id === id);
       if (!item) return;
 
-      const parsed = parseTargetKelasTokens(item.targetKelas);
       document.getElementById("modalExamId").value = item.id;
-      document.getElementById("modalExamToken").value = item.token || "";
-      document.getElementById("modalExamSubject").value = item.subject || "";
-      document.getElementById("modalExamAngkatan").value = selectedAngkatan || parsed.angkatan;
+      document.getElementById("modalExamToken").value = item.token || generateRandomToken();
+      document.getElementById("modalExamSubject").value = item.mapel || item.subject || "";
+      document.getElementById("modalExamAngkatan").value = selectedAngkatan || item.angkatan || "X";
       document.getElementById("modalExamAngkatan").disabled = true;
-      document.getElementById("modalExamJurusan").value = parsed.jurusan;
-      document.getElementById("modalExamDate").value = item.date || todayIso;
-      document.getElementById("modalExamStartTime").value = item.startTime || "07:30";
-      document.getElementById("modalExamEndTime").value = item.endTime || "09:00";
-      document.getElementById("modalExamDuration").value = item.durationMinutes || 60;
+      document.getElementById("modalExamJurusan").value = (item.jurusan === "ALL" ? "SEMUA" : item.jurusan) || "SEMUA";
+      document.getElementById("modalExamDate").value = ddmmyyyyToIso(item.examDate || item.date || todayIso);
+      document.getElementById("modalExamStartTime").value = item.mulai || item.startTime || "07:30";
+      document.getElementById("modalExamEndTime").value = item.selesai || item.endTime || "09:00";
+      document.getElementById("modalExamDuration").value = item.durationMinutes || 90;
       document.getElementById("modalExamMaxViolations").value = item.maxViolations || 3;
-      document.getElementById("modalExamUrl").value = item.formUrl || "";
+      document.getElementById("modalExamUrl").value = item.linkSoal || item.formUrl || "";
 
       document.getElementById("editScheduleModal").classList.remove("hidden");
     };
@@ -1561,25 +1664,30 @@
     document.getElementById("editScheduleForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const id = document.getElementById("modalExamId").value.trim();
-      const angkatan = document.getElementById("modalExamAngkatan").value;
-      const jurusan = document.getElementById("modalExamJurusan").value;
-      const targetKelas = jurusan === "ALL" ? angkatan : `${angkatan} ${jurusan}`;
+      const angkatan = document.getElementById("modalExamAngkatan").value || selectedAngkatan || "X";
+      const jurusan = document.getElementById("modalExamJurusan").value || "SEMUA";
+      const isoDate = document.getElementById("modalExamDate").value;
+      const examDate = isoToDDMMYYYY(isoDate);
+      const hariTanggal = formatIndonesianDateFromDDMMYYYY(examDate);
 
       const payload = {
-        subject: document.getElementById("modalExamSubject").value.trim(),
-        targetKelas,
-        date: document.getElementById("modalExamDate").value,
-        startTime: document.getElementById("modalExamStartTime").value,
-        endTime: document.getElementById("modalExamEndTime").value,
-        durationMinutes: Number(document.getElementById("modalExamDuration").value) || 60,
-        token: document.getElementById("modalExamToken").value.trim().toUpperCase(),
+        mapel: document.getElementById("modalExamSubject").value.trim().slice(0, 150),
+        angkatan,
+        jurusan,
+        examDate,
+        hariTanggal: hariTanggal.slice(0, 100),
+        mulai: document.getElementById("modalExamStartTime").value.trim().slice(0, 20),
+        selesai: document.getElementById("modalExamEndTime").value.trim().slice(0, 20),
+        durationMinutes: Number(document.getElementById("modalExamDuration").value) || 90,
+        token: document.getElementById("modalExamToken").value.trim().toUpperCase().slice(0, 30),
         maxViolations: Number(document.getElementById("modalExamMaxViolations").value) || 3,
-        formUrl: document.getElementById("modalExamUrl").value.trim()
+        linkSoal: document.getElementById("modalExamUrl").value.trim().slice(0, 500),
+        updatedAt: serverTimestamp()
       };
 
-      startLoading("upload", "Menyimpan Perubahan Jadwal...", `${payload.subject} (${id})`);
+      startLoading("upload", "Menyimpan Perubahan Jadwal...", `${payload.mapel} (${id})`);
       try {
-        await updateDoc(doc(db, "schedules", id), payload);
+        await updateDoc(doc(db, "exams", id), payload);
         stopLoading();
         window.closeEditScheduleModal();
         showNotification("success", "Jadwal Diperbarui", `Perubahan pada jadwal ${id} berhasil disimpan.`);
@@ -1594,7 +1702,7 @@
       if (!ok) return;
       startLoading("upload", "Menghapus Jadwal...", `Menghapus ${id} dari server`);
       try {
-        await deleteDoc(doc(db, "schedules", id));
+        await deleteDoc(doc(db, "exams", id));
         stopLoading();
         showNotification("success", "Jadwal Dihapus", `Jadwal ${id} telah dihapus.`);
       } catch (err) {
@@ -1604,7 +1712,7 @@
     };
 
     // ==========================================
-    // MENU 2: TAMBAH JADWAL MULTI-SESI (1 HARI BISA 3 SESI ATAU LEBIH)
+    // MENU 2: TAMBAH JADWAL MULTI-SESI (KOLEKSI: exams)
     // ==========================================
     let sessionRowCounter = 0;
 
@@ -1618,8 +1726,8 @@
     }
 
     function generateRowScheduleId(sesiNumber, subjectVal = "") {
-      const angkatan = document.getElementById("batchExamAngkatan").value || selectedAngkatan || "X";
-      const jurusan = document.getElementById("batchExamJurusan").value || "ALL";
+      const angkatan = selectedAngkatan || document.getElementById("batchExamAngkatan").value || "X";
+      const jurusan = document.getElementById("batchExamJurusan").value || "SEMUA";
       const cleanSubj = String(subjectVal || "MAPEL")
         .toUpperCase()
         .replace(/[^A-Z0-9]/g, "")
@@ -1755,46 +1863,57 @@
       window.addSessionRow();
     };
 
-    // Buat 1 baris sesi awal saat pertama kali dimuat
     window.addSessionRow();
 
     document.getElementById("batchScheduleForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const angkatan = selectedAngkatan || document.getElementById("batchExamAngkatan").value;
-      const jurusan = document.getElementById("batchExamJurusan").value;
-      const dateVal = document.getElementById("batchDefaultDate").value;
-      const targetKelas = jurusan === "ALL" ? angkatan : `${angkatan} ${jurusan}`;
+      if (!auth.currentUser) {
+        showNotification("error", "Belum Login", "Silakan login Google terlebih dahulu.");
+        return;
+      }
+      const angkatan = selectedAngkatan || document.getElementById("batchExamAngkatan").value || "X";
+      const jurusan = document.getElementById("batchExamJurusan").value || "SEMUA";
+      const isoDateVal = document.getElementById("batchDefaultDate").value;
+      const examDate = isoToDDMMYYYY(isoDateVal);
+      const hariTanggal = formatIndonesianDateFromDDMMYYYY(examDate);
 
       const cards = Array.from(document.querySelectorAll("#sessionRowsContainer .session-row-card"));
       if (cards.length === 0) return;
 
-      startLoading("upload", `Menyimpan ${cards.length} Sesi Jadwal...`, `Target: Kelas ${targetKelas}`);
+      startLoading("upload", `Menyimpan ${cards.length} Sesi Jadwal...`, `Target: Kelas ${angkatan} (${jurusan})`);
       try {
         for (const card of cards) {
-          const id = card.querySelector(".row-schedule-id").value.trim();
-          const subject = card.querySelector(".row-subject").value.trim();
-          const startTime = card.querySelector(".row-start-time").value;
-          const endTime = card.querySelector(".row-end-time").value;
+          const rawId = card.querySelector(".row-schedule-id").value.trim();
+          const id = rawId.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 120);
+          const mapel = card.querySelector(".row-subject").value.trim().slice(0, 150);
+          const mulai = card.querySelector(".row-start-time").value.trim().slice(0, 20);
+          const selesai = card.querySelector(".row-end-time").value.trim().slice(0, 20);
           const durationMinutes = Number(card.querySelector(".row-duration").value) || 90;
-          const token = card.querySelector(".row-token").value.trim().toUpperCase();
-          const formUrl = card.querySelector(".row-url").value.trim();
+          const token = card.querySelector(".row-token").value.trim().toUpperCase().slice(0, 30);
+          const linkSoal = card.querySelector(".row-url").value.trim().slice(0, 500);
           const maxViolations = Number(card.querySelector(".row-max-violations").value) || 3;
 
-          await setDoc(doc(db, "schedules", id), {
-            subject,
-            targetKelas,
-            date: dateVal,
-            startTime,
-            endTime,
-            durationMinutes,
+          await setDoc(doc(db, "exams", id), {
+            id,
+            mapel,
+            examDate,
+            hariTanggal: hariTanggal.slice(0, 100),
+            mulai,
+            selesai,
+            linkSoal,
+            angkatan,
+            jurusan,
+            isActive: true,
             token,
-            formUrl,
+            durationMinutes,
             maxViolations,
-            active: true
+            authorId: auth.currentUser.uid,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
           });
         }
         stopLoading();
-        showNotification("success", "Jadwal Berhasil Disimpan", `${cards.length} sesi jadwal untuk Kelas ${targetKelas} telah ditambahkan.`);
+        showNotification("success", "Jadwal Berhasil Disimpan", `${cards.length} sesi jadwal untuk Kelas ${angkatan} (${jurusan}) telah ditambahkan.`);
         window.resetBatchScheduleForm();
         window.switchMenuTab("jadwal");
       } catch (err) {
@@ -1804,7 +1923,7 @@
     });
 
     // ==========================================
-    // MENU 3: RESET PESERTA (DENGAN FILTER KONSENTRASI)
+    // MENU 3: RESET PESERTA (KOLEKSI: users)
     // ==========================================
     document.getElementById("searchStudentInput").addEventListener("input", renderStudents);
     document.getElementById("filterStateSelect").addEventListener("change", renderStudents);
@@ -1817,13 +1936,13 @@
       const stateFilter = document.getElementById("filterStateSelect").value;
 
       const filtered = allStudents.filter((u) => {
-        const matchKls = matchAngkatan(u.kelas, selectedAngkatan);
-        const matchJur = matchJurusan(u.kelas, resetJurusanFilter);
+        const matchKls = matchAngkatan(u, selectedAngkatan);
+        const matchJur = matchJurusan(u, resetJurusanFilter);
         const matchSearch =
           (u.nama || "").toLowerCase().includes(keyword) ||
           (u.username || "").toLowerCase().includes(keyword) ||
           (u.kelas || "").toLowerCase().includes(keyword);
-        const state = u.examState || "IDLE";
+        const state = u.examStatus || "idle";
         const matchState = stateFilter === "ALL" || state === stateFilter;
         return matchKls && matchJur && matchSearch && matchState;
       });
@@ -1840,18 +1959,21 @@
       }
 
       tbody.innerHTML = filtered.map((u) => {
-        const state = u.examState || "IDLE";
-        const vCount = u.violationCount || 0;
+        const state = u.examStatus || "idle";
+        const vCount = allLogs.filter((l) => l.uid === u.uid || (u.username && l.username === u.username)).length;
         let badgeClass = "bg-slate-100 text-slate-600";
         let stateText = "BELUM MULAI";
 
-        if (state === "LOCKED") {
+        if (state === "terkunci") {
           badgeClass = "bg-red-100 text-red-700 border border-red-300 animate-pulse";
           stateText = "🔒 TERKUNCI / KELUAR PAKSA";
-        } else if (state === "ACTIVE") {
+        } else if (state === "mengerjakan") {
           badgeClass = "bg-emerald-100 text-emerald-800 border border-emerald-200";
-          stateText = "🟢 SEDANG UJIAN";
-        } else if (state === "FINISHED") {
+          stateText = "🟢 SEDANG MENGERJAKAN";
+        } else if (state === "login") {
+          badgeClass = "bg-sky-100 text-sky-800 border border-sky-200";
+          stateText = "🔵 SUDAH LOGIN";
+        } else if (state === "selesai") {
           badgeClass = "bg-blue-100 text-blue-700";
           stateText = "✅ SELESAI";
         }
@@ -1869,7 +1991,7 @@
             <td class="py-2.5 px-3">
               <span class="px-2 py-0.5 rounded font-bold text-[10px] ${badgeClass}">${stateText}</span>
             </td>
-            <td class="py-2.5 px-3 font-mono text-[10px] text-slate-600">${escapeHtml(u.activeExamId || "-")}</td>
+            <td class="py-2.5 px-3 font-mono text-[10px] text-slate-600">${escapeHtml((u.deviceId || "-").slice(0, 16))}</td>
             <td class="py-2.5 px-3">
               <span class="font-extrabold ${vCount > 0 ? "text-red-600" : "text-slate-500"}">${vCount}x</span>
             </td>
@@ -1888,15 +2010,17 @@
     window.resetStudentLock = async (uid, name) => {
       const ok = await askConfirmation(
         "Reset Status Peserta",
-        `Izinkan "${name}" melanjutkan ujian kembali? Status terkunci dan hitungan pelanggaran akan di-reset ke 0.`
+        `Izinkan "${name}" melanjutkan ujian kembali? Status terkunci akan dibuka dan di-reset ke IDLE.`
       );
       if (!ok) return;
 
       startLoading("upload", "Mereset Status Peserta...", `Membuka kunci ujian untuk ${name}`);
       try {
         await updateDoc(doc(db, "users", uid), {
-          examState: "IDLE",
-          violationCount: 0
+          isLoggedIn: false,
+          examStatus: "idle",
+          statusMengerjakan: "0",
+          updatedAt: serverTimestamp()
         });
         stopLoading();
         showNotification("success", "Reset Peserta Berhasil", `${name} kini dapat masuk kembali ke ujian.`);
@@ -1907,7 +2031,7 @@
     };
 
     // ==========================================
-    // MENU 4: STATUS UJIAN PER ANGKATAN (X, XI, XII)
+    // MENU 4: STATUS UJIAN PER ANGKATAN (KOLEKSI: settings)
     // ==========================================
     window.loadClassSettings = async (silent = false) => {
       if (!selectedAngkatan) return;
@@ -1917,15 +2041,14 @@
         const snap = await getDoc(doc(db, "settings", docId));
         if (snap.exists()) {
           const data = snap.data();
-          document.getElementById("settingAssessmentName").value = data.assessmentName || `ASESMEN SUMATIF KELAS ${selectedAngkatan}`;
-          document.getElementById("settingAppStatus").value = data.status || "READY";
+          document.getElementById("settingAssessmentName").value = data.eventName || `ASESMEN SUMATIF KELAS ${selectedAngkatan}`;
+          document.getElementById("settingAppStatus").value = data.statusUjian !== false ? "READY" : "MAINTENANCE";
         } else {
-          // Fallback baca global jika belum pernah disimpan per-angkatan
           const globalSnap = await getDoc(doc(db, "settings", "global"));
           if (globalSnap.exists()) {
             const gData = globalSnap.data();
-            document.getElementById("settingAssessmentName").value = `${gData.assessmentName || "ASESMEN SUMATIF"} - KELAS ${selectedAngkatan}`;
-            document.getElementById("settingAppStatus").value = gData.status || "READY";
+            document.getElementById("settingAssessmentName").value = gData.eventName || `ASESMEN SUMATIF KELAS ${selectedAngkatan}`;
+            document.getElementById("settingAppStatus").value = gData.statusUjian !== false ? "READY" : "MAINTENANCE";
           } else {
             document.getElementById("settingAssessmentName").value = `ASESMEN SUMATIF KELAS ${selectedAngkatan}`;
             document.getElementById("settingAppStatus").value = "READY";
@@ -1945,10 +2068,10 @@
           const eventEl = document.getElementById(`summaryEvent-${kls}`);
           if (snap.exists()) {
             const d = snap.data();
-            const isReady = (d.status || "READY") === "READY";
+            const isReady = d.statusUjian !== false;
             statusEl.textContent = isReady ? "🟢 READY (Dibuka)" : "🟠 MAINTENANCE";
             statusEl.className = `text-xs font-extrabold mt-0.5 ${isReady ? "text-emerald-700" : "text-amber-700"}`;
-            eventEl.textContent = d.assessmentName || "-";
+            eventEl.textContent = d.eventName || "-";
           } else {
             statusEl.textContent = "🟢 READY (Default)";
             statusEl.className = "text-xs font-extrabold mt-0.5 text-emerald-700";
@@ -1964,31 +2087,33 @@
       e.preventDefault();
       if (!selectedAngkatan) return;
 
-      const assessmentName = document.getElementById("settingAssessmentName").value.trim();
-      const status = document.getElementById("settingAppStatus").value;
+      const eventName = document.getElementById("settingAssessmentName").value.trim().slice(0, 150);
+      const statusMode = document.getElementById("settingAppStatus").value;
+      const statusUjian = statusMode === "READY";
       const docId = `kelas_${selectedAngkatan}`;
+
+      const payload = {
+        statusUjian,
+        eventName,
+        eventClass: `Kelas ${selectedAngkatan}`,
+        eventYear: "Tahun Pelajaran 2025/2026",
+        updatedAt: serverTimestamp()
+      };
 
       startLoading("upload", `Menyimpan Status Kelas ${selectedAngkatan}...`, "Memperbarui konfigurasi server");
       try {
-        await setDoc(doc(db, "settings", docId), {
-          assessmentName,
-          status
-        });
-        // Update juga settings/global sebagai fallback aplikasi siswa
-        await setDoc(doc(db, "settings", "global"), {
-          assessmentName,
-          status
-        });
+        await setDoc(doc(db, "settings", docId), payload);
+        await setDoc(doc(db, "settings", "global"), payload);
         await window.loadAllClassSummary();
         stopLoading();
-        showNotification("success", `Status Kelas ${selectedAngkatan} Disimpan`, `Event "${assessmentName}" diatur ke ${status}.`);
+        showNotification("success", `Status Kelas ${selectedAngkatan} Disimpan`, `Event "${eventName}" diatur ke ${statusMode}.`);
       } catch (err) {
         stopLoading();
         showNotification("error", "Gagal Menyimpan Status Ujian", err.message);
       }
     });
 
-    // Admin Proktor Management
+    // Admin Proktor Management (Koleksi: admins)
     function renderAdmins(list) {
       const tbody = document.getElementById("adminsTableBody");
       if (list.length === 0) {
@@ -1998,7 +2123,7 @@
       tbody.innerHTML = list.map((a) => `
         <tr>
           <td class="py-2 px-2.5 font-mono text-[10px] text-slate-700">${escapeHtml(a.uid)}</td>
-          <td class="py-2 px-2.5 font-bold text-slate-800">${escapeHtml(a.name || a.email || "Proktor")}</td>
+          <td class="py-2 px-2.5 font-bold text-slate-800">${escapeHtml(a.name || a.role || "Proktor")}</td>
           <td class="py-2 px-2.5 text-center">
             <button type="button" onclick="window.removeAdmin('${escapeHtml(a.uid)}')" class="px-2.5 py-1 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-lg font-bold text-[10px] shadow-sm transition inline-flex items-center justify-center text-center">Hapus</button>
           </td>
@@ -2009,13 +2134,15 @@
     document.getElementById("addAdminForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const uid = document.getElementById("newAdminUid").value.trim();
-      const name = document.getElementById("newAdminName").value.trim();
+      const name = document.getElementById("newAdminName").value.trim().slice(0, 100);
       if (!uid) return;
       startLoading("upload", "Menambahkan Admin...", `Mendaftarkan ${name}`);
       try {
         await setDoc(doc(db, "admins", uid), {
+          uid,
           name,
-          addedAt: new Date().toISOString()
+          role: "proktor",
+          createdAt: serverTimestamp()
         });
         document.getElementById("addAdminForm").reset();
         stopLoading();
@@ -2041,7 +2168,7 @@
     };
 
     // ==========================================
-    // MENU 5: AKUN PESERTA UJIAN (USERNAME, PASSWORD, NAMA, KELAS + EDIT/HAPUS)
+    // MENU 5: AKUN PESERTA UJIAN (KOLEKSI: users)
     // ==========================================
     document.getElementById("searchAccountInput").addEventListener("input", renderAccounts);
 
@@ -2052,8 +2179,8 @@
       const keyword = (document.getElementById("searchAccountInput").value || "").toLowerCase();
 
       const filtered = allStudents.filter((u) => {
-        const matchKls = matchAngkatan(u.kelas, selectedAngkatan);
-        const matchJur = matchJurusan(u.kelas, accountJurusanFilter);
+        const matchKls = matchAngkatan(u, selectedAngkatan);
+        const matchJur = matchJurusan(u, accountJurusanFilter);
         const matchSearch =
           (u.nama || "").toLowerCase().includes(keyword) ||
           (u.username || "").toLowerCase().includes(keyword) ||
@@ -2125,16 +2252,26 @@
     document.getElementById("editStudentForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const uid = document.getElementById("editStudentUid").value;
-      const username = document.getElementById("editStudentUsername").value.trim().toLowerCase();
-      const password = document.getElementById("editStudentPassword").value.trim();
-      const nama = document.getElementById("editStudentNama").value.trim();
-      const kelas = document.getElementById("editStudentKelas").value.trim();
+      const username = document.getElementById("editStudentUsername").value.trim().slice(0, 100);
+      const password = document.getElementById("editStudentPassword").value.trim().slice(0, 100);
+      const nama = document.getElementById("editStudentNama").value.trim().toUpperCase().slice(0, 120);
+      const kelas = document.getElementById("editStudentKelas").value.trim().toUpperCase().slice(0, 40);
 
       if (!uid || !username || !nama || !kelas) return;
 
+      const angkatan = detectAngkatanFromKelas(kelas, selectedAngkatan || "X");
+      const jurusan = detectJurusanFromKelas(kelas);
+
       startLoading("upload", "Menyimpan Akun Peserta...", `Memperbarui data ${nama}`);
       try {
-        const updateData = { username, nama, kelas };
+        const updateData = {
+          username,
+          nama,
+          kelas,
+          angkatan,
+          jurusan,
+          updatedAt: serverTimestamp()
+        };
         if (password) {
           updateData.password = password;
         }
@@ -2164,7 +2301,7 @@
     };
 
     // ==========================================
-    // MENU 6: LOG PELANGGARAN (HARI INI & FILTER TANGGAL CUSTOM)
+    // MENU 6: LOG PELANGGARAN (KOLEKSI: cheat_logs)
     // ==========================================
     document.getElementById("searchLogInput").addEventListener("input", renderLogs);
 
@@ -2198,9 +2335,9 @@
     };
 
     function getLocalIsoDateFromTimestamp(ts) {
-      if (!ts) return "";
-      const d = new Date(ts);
-      if (isNaN(d.getTime())) return String(ts).slice(0, 10);
+      const ms = getTimestampMs(ts);
+      if (!ms) return "";
+      const d = new Date(ms);
       const yyyy = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, "0");
       const dd = String(d.getDate()).padStart(2, "0");
@@ -2214,7 +2351,7 @@
 
       return allLogs.filter((l) => {
         const matchKls = matchAngkatan(l.kelas, selectedAngkatan);
-        const logDate = getLocalIsoDateFromTimestamp(l.timestamp);
+        const logDate = getLocalIsoDateFromTimestamp(l.createdAt || l.timestamp);
 
         let matchDate = true;
         if (logDateMode === "TODAY") {
@@ -2226,8 +2363,8 @@
         const matchSearch =
           (l.nama || "").toLowerCase().includes(keyword) ||
           (l.username || "").toLowerCase().includes(keyword) ||
-          (l.type || "").toLowerCase().includes(keyword) ||
-          (l.examId || "").toLowerCase().includes(keyword);
+          (l.deskripsi || l.type || "").toLowerCase().includes(keyword) ||
+          (l.mapel || l.examId || "").toLowerCase().includes(keyword);
 
         return matchKls && matchDate && matchSearch;
       });
@@ -2257,7 +2394,7 @@
       }
 
       tbody.innerHTML = filtered.map((l) => {
-        const timeStr = l.timestamp ? new Date(l.timestamp).toLocaleString("id-ID") : "-";
+        const timeStr = formatTimestampDisplay(l.createdAt || l.timestamp);
         const safeId = escapeHtml(l.id);
         return `
           <tr class="hover:bg-slate-50 transition">
@@ -2268,9 +2405,9 @@
             </td>
             <td class="py-2.5 px-3 font-semibold text-slate-700">${escapeHtml(l.kelas || "-")}</td>
             <td class="py-2.5 px-3">
-              <span class="px-2 py-0.5 bg-red-50 text-red-700 border border-red-200 rounded font-bold text-[10px]">${escapeHtml(l.type || "PELANGGARAN")}</span>
+              <span class="px-2 py-0.5 bg-red-50 text-red-700 border border-red-200 rounded font-bold text-[10px]">${escapeHtml(l.deskripsi || l.type || "Keluar dari Penyematan Layar")}</span>
             </td>
-            <td class="py-2.5 px-3 font-mono text-[10px] text-slate-600">${escapeHtml(l.examId || "-")}</td>
+            <td class="py-2.5 px-3 font-mono text-[10px] text-slate-600">${escapeHtml(l.mapel || l.examId || "-")}</td>
             <td class="py-2.5 px-3 text-center">
               <button type="button" onclick="window.deleteSingleLog('${safeId}')" class="px-2.5 py-1 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold rounded-lg text-[10px] shadow-sm transition inline-flex items-center justify-center text-center">Hapus</button>
             </td>
@@ -2285,7 +2422,7 @@
 
       startLoading("upload", "Menghapus Log...", "Menghapus catatan pelanggaran");
       try {
-        await deleteDoc(doc(db, "logs", logId));
+        await deleteDoc(doc(db, "cheat_logs", logId));
         stopLoading();
         showNotification("success", "Log Dihapus", "Catatan pelanggaran berhasil dihapus.");
       } catch (err) {
@@ -2310,7 +2447,7 @@
       startLoading("upload", "Membersihkan Log Pelanggaran...", `Menghapus ${filtered.length} catatan log`);
       try {
         for (const item of filtered) {
-          await deleteDoc(doc(db, "logs", item.id));
+          await deleteDoc(doc(db, "cheat_logs", item.id));
         }
         stopLoading();
         showNotification("success", "Log Dibersihkan", `${filtered.length} catatan pelanggaran berhasil dihapus.`);
