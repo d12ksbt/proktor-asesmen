@@ -11,9 +11,47 @@
       font-family: 'Inter', sans-serif;
       font-size: 11px;
     }
+    @keyframes progressIndeterminate {
+      0% { transform: translateX(-100%) scaleX(0.2); }
+      50% { transform: translateX(0%) scaleX(0.5); }
+      100% { transform: translateX(100%) scaleX(0.2); }
+    }
+    .animate-progress-bar {
+      animation: progressIndeterminate 1.2s infinite linear;
+      transform-origin: left;
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(24px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .toast-enter {
+      animation: slideInRight 0.22s ease-out forwards;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col text-[11px]">
+
+  <!-- TOP PROGRESS BAR ANIMATION (AKTIF SAAT UPLOAD / DOWNLOAD DATA) -->
+  <div id="topLoadingBar" class="hidden fixed top-0 left-0 right-0 h-1 bg-teal-950 overflow-hidden z-50">
+    <div id="topLoadingBarInner" class="h-full w-full bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-400 animate-progress-bar"></div>
+  </div>
+
+  <!-- FLOATING LOADING PILL / OVERLAY INDICATOR (UPLOAD & DOWNLOAD) -->
+  <div id="loadingOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/35 backdrop-blur-[1px] flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl border border-slate-200 px-5 py-4 flex items-center space-x-3.5 max-w-xs w-full">
+      <div class="relative flex items-center justify-center">
+        <div class="w-8 h-8 rounded-full border-3 border-slate-200 border-t-teal-600 animate-spin"></div>
+        <span id="loadingDirectionIcon" class="absolute text-[10px] font-extrabold text-teal-700">↑</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p id="loadingTitle" class="text-xs font-bold text-slate-900 truncate">Memproses Data...</p>
+        <p id="loadingSubtitle" class="text-[10px] text-slate-500 truncate">Menghubungkan ke Cloud Firestore</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTAINER TOAST NOTIFIKASI SUKSES / GAGAL (KANAN ATAS) -->
+  <div id="toastContainer" class="fixed top-14 right-4 z-50 flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
 
   <!-- BANNER PERINGATAN PROTOKOL FILE:// -->
   <div id="fileProtocolBanner" class="hidden bg-amber-600 text-white px-3 py-2 shadow-md">
@@ -34,7 +72,7 @@
         <strong class="font-extrabold uppercase tracking-wide">⚠️ Akun Belum Memiliki Hak Akses Admin Proktor</strong>
         <p class="mt-0.5 text-red-100">
           Anda login sebagai <strong id="nonAdminEmailText"></strong> (UID: <code id="nonAdminUidText" class="bg-red-800 px-1 py-0.5 rounded select-all"></code>).
-          Untuk menyimpan jadwal/mengelola peserta, silakan login menggunakan akun Admin Utama (<strong>niotron.project@gmail.com</strong>) atau daftarkan UID di atas pada menu <strong>4. Status Server &rarr; Daftar Admin Proktor</strong> menggunakan akun Admin Utama.
+          Untuk menyimpan jadwal/mengelola peserta, silakan login menggunakan akun Admin Utama (<strong>niotron.project@gmail.com</strong>) atau daftarkan UID di atas pada menu <strong>4. Status Server &rarr; Manajemen Akses Proktor</strong> menggunakan akun Admin Utama.
         </p>
       </div>
     </div>
@@ -48,13 +86,23 @@
           P
         </div>
         <div>
-          <h1 class="text-sm font-bold tracking-tight">Panel Manajemen Asesmen</h1>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm font-bold tracking-tight">Panel Manajemen Asesmen</h1>
+            <span id="syncIndicatorBadge" class="hidden items-center gap-1 text-[9px] font-semibold bg-slate-800 text-teal-400 px-2 py-0.5 rounded-full border border-slate-700">
+              <span id="syncSpinner" class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span>
+              <span id="syncStatusLabel">Sinkronisasi...</span>
+            </span>
+          </div>
           <p class="text-[10px] text-slate-400">SMKN 1 Mondokan &bull; Cloud Firestore Realtime</p>
         </div>
       </div>
 
       <!-- AUTH BAR -->
       <div id="authSection" class="flex items-center space-x-2">
+        <button id="btnRefreshData" title="Download & Sinkronkan Ulang Data" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold px-2.5 py-1.5 rounded-md border border-slate-700 transition flex items-center gap-1">
+          <span id="refreshIcon" class="inline-block">↻</span>
+          <span>Muat Ulang Data</span>
+        </button>
         <span id="authStatusText" class="text-[10px] bg-slate-800 px-2.5 py-1 rounded-md text-slate-300 border border-slate-700">
           Belum Login
         </span>
@@ -200,8 +248,8 @@
           </div>
 
           <div class="flex gap-2 pt-1">
-            <button type="submit" id="btnSubmitExam" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-md text-xs shadow transition">
-              Simpan Jadwal
+            <button type="submit" id="btnSubmitExam" class="flex-1 bg-teal-700 hover:bg-teal-800 disabled:opacity-60 text-white font-bold py-2 rounded-md text-xs shadow transition flex items-center justify-center gap-1.5">
+              <span>Simpan Jadwal</span>
             </button>
             <button type="button" id="btnCancelEditExam" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded-md text-xs transition">
               Batal Edit
@@ -240,7 +288,12 @@
             </thead>
             <tbody id="examsTableBody" class="divide-y divide-slate-200">
               <tr>
-                <td colspan="5" class="py-6 text-center text-slate-400">Memuat jadwal ujian...</td>
+                <td colspan="5" class="py-8 text-center text-slate-400">
+                  <div class="inline-flex items-center gap-2">
+                    <span class="w-4 h-4 rounded-full border-2 border-slate-300 border-t-teal-600 animate-spin"></span>
+                    <span>Mengunduh daftar jadwal ujian...</span>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -288,7 +341,12 @@
           </thead>
           <tbody id="usersTableBody" class="divide-y divide-slate-200">
             <tr>
-              <td colspan="6" class="py-6 text-center text-slate-400">Memuat data peserta...</td>
+              <td colspan="6" class="py-8 text-center text-slate-400">
+                <div class="inline-flex items-center gap-2">
+                  <span class="w-4 h-4 rounded-full border-2 border-slate-300 border-t-teal-600 animate-spin"></span>
+                  <span>Mengunduh data peserta ujian...</span>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -323,7 +381,12 @@
           </thead>
           <tbody id="logsTableBody" class="divide-y divide-slate-200">
             <tr>
-              <td colspan="6" class="py-6 text-center text-slate-400">Belum ada pelanggaran tercatat.</td>
+              <td colspan="6" class="py-8 text-center text-slate-400">
+                <div class="inline-flex items-center gap-2">
+                  <span class="w-4 h-4 rounded-full border-2 border-slate-300 border-t-teal-600 animate-spin"></span>
+                  <span>Mengunduh log pelanggaran...</span>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -412,7 +475,7 @@
             </thead>
             <tbody id="adminsTableBody" class="divide-y divide-slate-200">
               <tr>
-                <td colspan="3" class="py-4 text-center text-slate-400">Belum ada UID proktor tambahan.</td>
+                <td colspan="3" class="py-4 text-center text-slate-400">Memuat daftar proktor...</td>
               </tr>
             </tbody>
           </table>
@@ -425,7 +488,7 @@
   <!-- ========================================== -->
   <!-- MODAL EDIT PESERTA (users)                 -->
   <!-- ========================================== -->
-  <div id="editUserModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="editUserModal" class="hidden fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-sm w-full p-4">
       <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
         <h4 class="text-xs font-bold text-slate-900">Edit Data Peserta Ujian</h4>
@@ -490,7 +553,7 @@
   <!-- ========================================== -->
   <!-- MODAL EDIT LOG PELANGGARAN (cheat_logs)    -->
   <!-- ========================================== -->
-  <div id="editLogModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="editLogModal" class="hidden fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-sm w-full p-4">
       <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
         <h4 class="text-xs font-bold text-slate-900">Edit Catatan Log Pelanggaran</h4>
@@ -563,6 +626,97 @@
       document.getElementById('fileProtocolBanner').classList.remove('hidden');
     }
 
+    // ====================================================
+    // SISTEM LOADING ANIMASI (UPLOAD & DOWNLOAD) & TOAST
+    // ====================================================
+    const topLoadingBar = document.getElementById('topLoadingBar');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingTitle = document.getElementById('loadingTitle');
+    const loadingSubtitle = document.getElementById('loadingSubtitle');
+    const loadingDirectionIcon = document.getElementById('loadingDirectionIcon');
+    const syncIndicatorBadge = document.getElementById('syncIndicatorBadge');
+    const syncSpinner = document.getElementById('syncSpinner');
+    const syncStatusLabel = document.getElementById('syncStatusLabel');
+    const toastContainer = document.getElementById('toastContainer');
+
+    let loadingCounter = 0;
+
+    /**
+     * Menampilkan animasi loading untuk Upload (menyimpan/menghapus) atau Download (mengambil data)
+     * @param {string} title - Judul proses
+     * @param {string} subtitle - Subjudul detail
+     * @param {'upload'|'download'} mode - Jenis transaksi data
+     * @param {boolean} blocking - Tampilkan modal overlay tengah layar jika true
+     */
+    function showLoading(title = 'Memproses Data...', subtitle = 'Mohon tunggu sebentar', mode = 'upload', blocking = true) {
+      loadingCounter++;
+      topLoadingBar.classList.remove('hidden');
+      syncIndicatorBadge.classList.remove('hidden');
+      syncIndicatorBadge.classList.add('inline-flex');
+      syncSpinner.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
+      syncStatusLabel.textContent = mode === 'upload' ? 'Mengunggah...' : 'Mengunduh...';
+
+      if (blocking) {
+        loadingTitle.textContent = title;
+        loadingSubtitle.textContent = subtitle;
+        loadingDirectionIcon.textContent = mode === 'upload' ? '↑' : '↓';
+        loadingOverlay.classList.remove('hidden');
+      }
+    }
+
+    function hideLoading() {
+      loadingCounter = Math.max(0, loadingCounter - 1);
+      if (loadingCounter === 0) {
+        topLoadingBar.classList.add('hidden');
+        loadingOverlay.classList.add('hidden');
+        syncSpinner.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        syncStatusLabel.textContent = 'Tersinkron';
+      }
+    }
+
+    /**
+     * Menampilkan Notifikasi Toast Sukses / Gagal / Info
+     * @param {string} title - Judul notifikasi
+     * @param {string} message - Isi pesan detail
+     * @param {'success'|'error'|'info'} type - Tipe notifikasi
+     */
+    function showToast(title, message, type = 'success') {
+      const toast = document.createElement('div');
+      let bgClass = 'bg-emerald-700 border-emerald-500 text-white';
+      let iconHtml = '✓';
+
+      if (type === 'error') {
+        bgClass = 'bg-red-700 border-red-500 text-white';
+        iconHtml = '✕';
+      } else if (type === 'info') {
+        bgClass = 'bg-slate-800 border-teal-500 text-white';
+        iconHtml = '↓';
+      }
+
+      toast.className = `toast-enter pointer-events-auto rounded-xl shadow-xl border px-3.5 py-2.5 flex items-start gap-2.5 ${bgClass}`;
+      toast.innerHTML = `
+        <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center font-extrabold text-xs shrink-0 mt-0.5">
+          ${iconHtml}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-xs leading-tight">${title}</p>
+          <p class="text-[10px] text-white/90 mt-0.5 leading-relaxed break-words">${message}</p>
+        </div>
+        <button type="button" class="text-white/70 hover:text-white font-bold text-xs leading-none ml-1">&times;</button>
+      `;
+
+      const closeBtn = toast.querySelector('button');
+      const removeToast = () => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.2s ease';
+        setTimeout(() => toast.remove(), 200);
+      };
+      closeBtn.addEventListener('click', removeToast);
+      toastContainer.appendChild(toast);
+
+      setTimeout(removeToast, type === 'error' ? 6000 : 3500);
+    }
+
     const firebaseConfig = {
       projectId: "fluid-forklift-w0z9n",
       appId: "1:840221180515:web:7c4705112f1345a6516e56",
@@ -587,10 +741,8 @@
       return `${dd}-${mm}-${yyyy}`;
     }
 
-    // Normalisasi otomatis format tanggal ke DD-MM-YYYY agar selalu lolos validasi Firestore Rules
     function normalizeDateToDDMMYYYY(raw) {
       const clean = (raw || '').trim().replace(/[/.]/g, '-');
-      // Jika sudah D-M-YYYY atau DD-MM-YYYY
       const dmy = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(clean);
       if (dmy) {
         const dd = dmy[1].padStart(2, '0');
@@ -598,7 +750,6 @@
         const yyyy = dmy[3];
         return `${dd}-${mm}-${yyyy}`;
       }
-      // Jika YYYY-MM-DD
       const ymd = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(clean);
       if (ymd) {
         const yyyy = ymd[1];
@@ -627,7 +778,11 @@
     document.getElementById('todayDateDisplay').textContent = getTodayFormatted();
     fillTodayDateFields();
 
-    document.getElementById('btnSetToday').addEventListener('click', fillTodayDateFields);
+    document.getElementById('btnSetToday').addEventListener('click', () => {
+      fillTodayDateFields();
+      showToast('Tanggal Diisi', 'Tanggal jadwal diatur ke hari ini (' + getTodayFormatted() + ').', 'info');
+    });
+
     document.getElementById('examDate').addEventListener('blur', (e) => {
       const norm = normalizeDateToDDMMYYYY(e.target.value);
       e.target.value = norm;
@@ -657,27 +812,44 @@
     async function triggerGoogleLogin() {
       loginErrorMsg.classList.add('hidden');
       if (window.location.protocol === 'file:') {
-        loginErrorMsg.innerHTML = `<strong>Tidak bisa Login dari file lokal (file://):</strong><br/>Silakan upload file ini sebagai <code>index.html</code> ke <strong>GitHub Pages</strong> atau jalankan lewat local server (<code>http://localhost</code>), lalu daftarkan domain Anda di Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains.`;
+        const fileMsg = `Tidak bisa Login dari file lokal (file://). Upload file ini ke GitHub Pages atau jalankan lewat local server.`;
+        loginErrorMsg.innerHTML = `<strong>${fileMsg}</strong>`;
         loginErrorMsg.classList.remove('hidden');
+        showToast('Login Diblokir Protokol Lokal', fileMsg, 'error');
         return;
       }
+      showLoading('Autentikasi Proktor...', 'Membuka jendela login Google', 'upload', true);
       try {
-        await signInWithPopup(auth, provider);
+        const res = await signInWithPopup(auth, provider);
+        showToast('Login Berhasil', `Selamat datang, ${res.user.email}`, 'success');
       } catch (err) {
         let msg = "Gagal login Google: " + (err.message || err);
         if (err.code === 'auth/unauthorized-domain') {
-          msg = `Domain <strong>${window.location.hostname}</strong> belum diizinkan di Firebase. Buka <strong>Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains</strong> lalu klik <strong>Add domain</strong> dan masukkan <code>${window.location.hostname}</code>.`;
+          msg = `Domain ${window.location.hostname} belum diizinkan di Firebase Console -> Authentication -> Settings -> Authorized domains.`;
         } else if (err.code === 'auth/operation-not-supported-in-this-environment') {
-          msg = `Lingkungan browser tidak mendukung Popup OAuth (kemungkinan dibuka via file://). Harap buka melalui <strong>https://</strong> (GitHub Pages) atau <strong>http://localhost</strong>.`;
+          msg = `Browser tidak mendukung Popup OAuth pada protokol ini. Gunakan https:// (GitHub Pages) atau http://localhost.`;
         }
         loginErrorMsg.innerHTML = msg;
         loginErrorMsg.classList.remove('hidden');
+        showToast('Gagal Login Proktor', msg, 'error');
+      } finally {
+        hideLoading();
       }
     }
 
     document.getElementById('btnLoginGoogle').addEventListener('click', triggerGoogleLogin);
     document.getElementById('btnLoginGate').addEventListener('click', triggerGoogleLogin);
-    document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
+    document.getElementById('btnLogout').addEventListener('click', async () => {
+      showLoading('Keluar Sesi...', 'Menutup koneksi akun Proktor', 'upload', true);
+      try {
+        await signOut(auth);
+        showToast('Berhasil Keluar', 'Anda telah keluar dari Panel Proktor.', 'info');
+      } catch (err) {
+        showToast('Gagal Keluar', err.message, 'error');
+      } finally {
+        hideLoading();
+      }
+    });
 
     let unsubExams = null;
     let unsubUsers = null;
@@ -687,6 +859,7 @@
     let cachedUsers = [];
     let cachedLogs = new Map();
     let editingExamId = null;
+    let initialDownloadNotified = false;
     let currentRandomSuffix = Math.floor(1000 + Math.random() * 9000);
 
     // Generator Otomatis ID Jadwal Unik
@@ -727,6 +900,7 @@
           document.getElementById('nonAdminEmailText').textContent = user.email || 'Tanpa Email';
           document.getElementById('nonAdminUidText').textContent = user.uid;
           nonAdminBanner.classList.remove('hidden');
+          showToast('Peringatan Akses', 'Akun ini belum terdaftar sebagai Admin Proktor.', 'error');
         }
       } catch {
         document.getElementById('nonAdminEmailText').textContent = user.email || 'Tanpa Email';
@@ -735,10 +909,30 @@
       }
     }
 
+    // Tombol Muat Ulang / Download Data Manual
+    document.getElementById('btnRefreshData').addEventListener('click', async () => {
+      const refreshIcon = document.getElementById('refreshIcon');
+      refreshIcon.classList.add('animate-spin');
+      showLoading('Mengunduh Data Terbaru...', 'Menyinkronkan jadwal, peserta, dan log dari Firestore', 'download', true);
+      try {
+        startRealtimeListeners(true);
+        await loadGlobalSettings(false);
+        showToast('Sinkronisasi Berhasil', 'Seluruh data berhasil diunduh dari server.', 'success');
+      } catch (err) {
+        showToast('Gagal Mengunduh Data', err.message, 'error');
+      } finally {
+        setTimeout(() => {
+          refreshIcon.classList.remove('animate-spin');
+          hideLoading();
+        }, 400);
+      }
+    });
+
     onAuthStateChanged(auth, async (user) => {
       const authStatusText = document.getElementById('authStatusText');
       const btnLoginGoogle = document.getElementById('btnLoginGoogle');
       const btnLogout = document.getElementById('btnLogout');
+      const btnRefreshData = document.getElementById('btnRefreshData');
       const loginGate = document.getElementById('loginGate');
       const adminMain = document.getElementById('adminMain');
 
@@ -746,15 +940,21 @@
         authStatusText.textContent = user.email;
         btnLoginGoogle.classList.add('hidden');
         btnLogout.classList.remove('hidden');
+        btnRefreshData.classList.remove('hidden');
         loginGate.classList.add('hidden');
         adminMain.classList.remove('hidden');
+
+        showLoading('Mengunduh Data Server...', 'Memuat jadwal, peserta, dan pengaturan asesmen', 'download', true);
         await checkAdminPermissionBanner(user);
-        startRealtimeListeners();
-        loadGlobalSettings();
+        startRealtimeListeners(false);
+        await loadGlobalSettings(false);
+        hideLoading();
       } else {
         authStatusText.textContent = "Belum Login";
         btnLoginGoogle.classList.remove('hidden');
         btnLogout.classList.add('hidden');
+        btnRefreshData.classList.add('hidden');
+        syncIndicatorBadge.classList.add('hidden');
         loginGate.classList.remove('hidden');
         adminMain.classList.add('hidden');
         document.getElementById('nonAdminBanner').classList.add('hidden');
@@ -783,11 +983,14 @@
       examFormTitle.textContent = 'Tambah Jadwal Ujian';
       examModeBadge.textContent = 'Mode Tambah';
       examModeBadge.className = 'text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200';
-      btnSubmitExam.textContent = 'Simpan Jadwal';
+      btnSubmitExam.innerHTML = '<span>Simpan Jadwal</span>';
       btnCancelEditExam.classList.add('hidden');
     }
 
-    btnCancelEditExam.addEventListener('click', resetExamFormMode);
+    btnCancelEditExam.addEventListener('click', () => {
+      resetExamFormMode();
+      showToast('Edit Dibatalkan', 'Formulir kembali ke mode Tambah Jadwal.', 'info');
+    });
 
     window.editExam = (id) => {
       const ex = cachedExams.get(id);
@@ -807,29 +1010,42 @@
       examFormTitle.textContent = 'Edit Jadwal: ' + id;
       examModeBadge.textContent = 'Mode Edit';
       examModeBadge.className = 'text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200';
-      btnSubmitExam.textContent = 'Update Jadwal Ujian';
+      btnSubmitExam.innerHTML = '<span>Update Jadwal Ujian</span>';
       btnCancelEditExam.classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast('Mode Edit Aktif', `Mengedit jadwal "${ex.mapel}" (${id}).`, 'info');
     };
 
     window.deleteExam = async (id) => {
       if (!confirm('Hapus jadwal ujian ' + id + '?')) return;
+      showLoading('Menghapus Jadwal...', `Menghapus jadwal ${id} dari server`, 'upload', true);
       try {
         await deleteDoc(doc(db, 'exams', id));
         if (editingExamId === id) resetExamFormMode();
+        showToast('Berhasil Dihapus', `Jadwal ujian ${id} telah dihapus.`, 'success');
       } catch (err) {
-        alert('Gagal menghapus jadwal: ' + err.message);
+        showToast('Gagal Menghapus Jadwal', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     };
 
     document.getElementById('btnDeleteAllExams').addEventListener('click', async () => {
-      if (cachedExams.size === 0) return;
+      if (cachedExams.size === 0) {
+        showToast('Data Kosong', 'Tidak ada jadwal ujian untuk dihapus.', 'info');
+        return;
+      }
       if (!confirm(`Hapus SEMUA (${cachedExams.size}) jadwal ujian? Tindakan ini tidak dapat dibatalkan.`)) return;
+      showLoading('Menghapus Semua Jadwal...', `Menghapus ${cachedExams.size} dokumen jadwal ujian`, 'upload', true);
       try {
+        const count = cachedExams.size;
         await Promise.all(Array.from(cachedExams.keys()).map(id => deleteDoc(doc(db, 'exams', id))));
         resetExamFormMode();
+        showToast('Berhasil Dihapus', `Seluruh jadwal ujian (${count} jadwal) berhasil dihapus.`, 'success');
       } catch (err) {
-        alert('Gagal menghapus semua jadwal: ' + err.message);
+        showToast('Gagal Menghapus Semua Jadwal', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     });
 
@@ -844,7 +1060,7 @@
       document.getElementById('examDate').value = examDate;
 
       if (!/^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-[0-9]{4}$/.test(examDate)) {
-        alert('Format Tanggal wajib DD-MM-YYYY (contoh: 30-10-2026).');
+        showToast('Format Tanggal Salah', 'Format Tanggal wajib DD-MM-YYYY (contoh: 30-10-2026).', 'error');
         return;
       }
 
@@ -857,8 +1073,17 @@
       const linkSoal = document.getElementById('examLinkSoal').value.trim().slice(0, 500);
       const isActive = document.getElementById('examIsActive').checked;
 
+      const isEditMode = Boolean(editingExamId);
+      btnSubmitExam.disabled = true;
+      showLoading(
+        isEditMode ? 'Mengunggah Perubahan Jadwal...' : 'Mengunggah Jadwal Baru...',
+        `${mapel} (${examDate})`,
+        'upload',
+        true
+      );
+
       try {
-        if (editingExamId) {
+        if (isEditMode) {
           await updateDoc(doc(db, 'exams', editingExamId), {
             mapel,
             examDate,
@@ -872,6 +1097,7 @@
             updatedAt: serverTimestamp()
           });
           resetExamFormMode();
+          showToast('Jadwal Diperbarui', `Jadwal "${mapel}" berhasil diperbarui di Firestore.`, 'success');
         } else {
           await setDoc(doc(db, 'exams', id), {
             id,
@@ -889,20 +1115,25 @@
             updatedAt: serverTimestamp()
           });
           resetExamFormMode();
+          showToast('Jadwal Tersimpan', `Jadwal "${mapel}" (${id}) berhasil disimpan ke Firestore.`, 'success');
         }
       } catch (err) {
-        alert(
-          "Gagal menyimpan jadwal: " + err.message +
-          "\n\nPastikan Anda login dengan email Admin Proktor (niotron.project@gmail.com) atau UID Anda (" +
-          (auth.currentUser?.uid || '-') + ") sudah didaftarkan di menu 4. Status Server -> Manajemen Akses Proktor."
+        showToast(
+          'Gagal Menyimpan Jadwal',
+          `${err.message}. Pastikan akun Anda adalah Admin Proktor.`,
+          'error'
         );
+      } finally {
+        btnSubmitExam.disabled = false;
+        hideLoading();
       }
     });
 
     // ====================================================
     // 2. MANAJEMEN PESERTA (RESET, EDIT, HAPUS)
     // ====================================================
-    window.resetUserStatus = async (uid) => {
+    window.resetUserStatus = async (uid, nama = 'Peserta') => {
+      showLoading('Mereset Status Murid...', `Membuka kunci ujian untuk ${nama}`, 'upload', true);
       try {
         await updateDoc(doc(db, 'users', uid), {
           isLoggedIn: false,
@@ -910,8 +1141,11 @@
           statusMengerjakan: '0',
           updatedAt: serverTimestamp()
         });
+        showToast('Reset Berhasil', `Status pengerjaan "${nama}" berhasil dibuka kembali.`, 'success');
       } catch (err) {
-        alert("Gagal mereset status peserta: " + err.message);
+        showToast('Gagal Mereset Peserta', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     };
 
@@ -948,6 +1182,7 @@
       const examStatus = examStatusMap[statusMengerjakan] || 'idle';
       const isLoggedIn = statusMengerjakan === '1';
 
+      showLoading('Menyimpan Data Murid...', `Memperbarui profil ${nama}`, 'upload', true);
       try {
         await updateDoc(doc(db, 'users', uid), {
           username,
@@ -961,27 +1196,35 @@
           updatedAt: serverTimestamp()
         });
         closeEditUserModal();
+        showToast('Data Murid Diperbarui', `Profil "${nama}" (${kelas}) berhasil disimpan.`, 'success');
       } catch (err) {
-        alert('Gagal mengupdate data peserta: ' + err.message);
+        showToast('Gagal Mengupdate Murid', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     });
 
     window.deleteUserDoc = async (uid, nama) => {
       if (!confirm(`Hapus data profil peserta "${nama}" dari Firestore?`)) return;
+      showLoading('Menghapus Peserta...', `Menghapus profil ${nama} dari database`, 'upload', true);
       try {
         await deleteDoc(doc(db, 'users', uid));
+        showToast('Peserta Dihapus', `Data peserta "${nama}" berhasil dihapus.`, 'success');
       } catch (err) {
-        alert('Gagal menghapus peserta: ' + err.message);
+        showToast('Gagal Menghapus Peserta', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     };
 
     document.getElementById('btnResetAllLocked').addEventListener('click', async () => {
       const locked = cachedUsers.filter(u => String(u.statusMengerjakan) === '1' || u.examStatus === 'mengerjakan' || u.examStatus === 'terkunci');
       if (locked.length === 0) {
-        alert("Tidak ada murid yang berstatus terkunci/mengerjakan saat ini.");
+        showToast('Tidak Ada Murid Terkunci', 'Saat ini tidak ada murid yang berstatus terkunci/mengerjakan.', 'info');
         return;
       }
       if (!confirm(`Reset status ${locked.length} murid yang sedang terkunci/mengerjakan agar bisa login ulang?`)) return;
+      showLoading('Mereset Massal...', `Membuka kunci ${locked.length} murid secara serentak`, 'upload', true);
       try {
         await Promise.all(locked.map(u => updateDoc(doc(db, 'users', u.id), {
           isLoggedIn: false,
@@ -989,8 +1232,11 @@
           statusMengerjakan: '0',
           updatedAt: serverTimestamp()
         })));
+        showToast('Reset Massal Berhasil', `${locked.length} murid telah direset menjadi siap login (Idle).`, 'success');
       } catch (err) {
-        alert("Gagal mereset massal: " + err.message);
+        showToast('Gagal Mereset Massal', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     });
 
@@ -1040,7 +1286,7 @@
             <td class="py-2 px-2.5">${badge}</td>
             <td class="py-2 px-2.5 text-slate-500 text-[10px]">${lastLogin}</td>
             <td class="py-2 px-2.5 text-right space-x-1 whitespace-nowrap">
-              <button onclick="window.resetUserStatus('${u.id}')" 
+              <button onclick="window.resetUserStatus('${u.id}', '${safeName}')" 
                 class="bg-teal-50 hover:bg-teal-100 text-teal-700 text-[10px] font-bold px-2 py-0.5 rounded border border-teal-200 transition">
                 Reset / Buka Kunci
               </button>
@@ -1088,6 +1334,7 @@
       const mapel = document.getElementById('editLogMapel').value.trim();
       const deskripsi = document.getElementById('editLogDeskripsi').value.trim();
 
+      showLoading('Menyimpan Perubahan Log...', `Memperbarui log pelanggaran ${nama}`, 'upload', true);
       try {
         await updateDoc(doc(db, 'cheat_logs', logId), {
           username,
@@ -1097,31 +1344,50 @@
           deskripsi
         });
         closeEditLogModal();
+        showToast('Log Diperbarui', `Catatan pelanggaran "${nama}" berhasil disimpan.`, 'success');
       } catch (err) {
-        alert('Gagal mengupdate log pelanggaran: ' + err.message);
+        showToast('Gagal Mengupdate Log', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     });
 
     window.deleteCheatLog = async (logId) => {
       if (!confirm('Hapus catatan pelanggaran ini?')) return;
+      showLoading('Menghapus Log...', 'Menghapus catatan pelanggaran dari server', 'upload', true);
       try {
         await deleteDoc(doc(db, 'cheat_logs', logId));
+        showToast('Log Dihapus', 'Catatan pelanggaran berhasil dihapus.', 'success');
       } catch (err) {
-        alert('Gagal menghapus log: ' + err.message);
+        showToast('Gagal Menghapus Log', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     };
 
     // ====================================================
     // 4. REALTIME LISTENERS (EXAMS, USERS, CHEAT_LOGS, ADMINS)
     // ====================================================
-    function startRealtimeListeners() {
+    function startRealtimeListeners(isManualRefresh = false) {
+      if (unsubExams) unsubExams();
+      if (unsubUsers) unsubUsers();
+      if (unsubLogs) unsubLogs();
+      if (unsubAdmins) unsubAdmins();
+
       const todayStr = getTodayFormatted();
+      showLoading('Mengunduh Data Realtime...', 'Menyinkronkan koleksi Firestore', 'download', false);
 
       // A. Listener Jadwal Ujian
       unsubExams = onSnapshot(collection(db, 'exams'), (snap) => {
         const tbody = document.getElementById('examsTableBody');
         document.getElementById('examCountBadge').textContent = `${snap.size} Jadwal`;
         cachedExams.clear();
+        hideLoading();
+
+        if (!initialDownloadNotified && !isManualRefresh) {
+          initialDownloadNotified = true;
+          showToast('Data Berhasil Diunduh', `Terhubung ke server (${snap.size} jadwal aktif dimuat).`, 'info');
+        }
 
         if (snap.empty) {
           tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada jadwal ujian di Firestore.</td></tr>`;
@@ -1168,12 +1434,17 @@
             </tr>
           `;
         }).join('');
+      }, (err) => {
+        hideLoading();
+        showToast('Gagal Mengunduh Jadwal', err.message, 'error');
       });
 
       // B. Listener Peserta (users)
       unsubUsers = onSnapshot(collection(db, 'users'), (snap) => {
         cachedUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         renderUsersTable();
+      }, (err) => {
+        showToast('Gagal Mengunduh Peserta', err.message, 'error');
       });
 
       // C. Listener Log Pelanggaran (cheat_logs)
@@ -1213,6 +1484,8 @@
             </tr>
           `;
         }).join('');
+      }, (err) => {
+        showToast('Gagal Mengunduh Log Pelanggaran', err.message, 'error');
       });
 
       // D. Listener Daftar Admin Proktor (admins)
@@ -1239,9 +1512,21 @@
       }, () => {});
 
       document.getElementById('btnClearLogs').onclick = async () => {
-        if (cachedLogs.size === 0) return;
+        if (cachedLogs.size === 0) {
+          showToast('Log Kosong', 'Tidak ada catatan log pelanggaran untuk dibersihkan.', 'info');
+          return;
+        }
         if (!confirm("Hapus semua catatan log pelanggaran?")) return;
-        await Promise.all(Array.from(cachedLogs.keys()).map(id => deleteDoc(doc(db, 'cheat_logs', id))));
+        showLoading('Membersihkan Semua Log...', `Menghapus ${cachedLogs.size} catatan pelanggaran`, 'upload', true);
+        try {
+          const total = cachedLogs.size;
+          await Promise.all(Array.from(cachedLogs.keys()).map(id => deleteDoc(doc(db, 'cheat_logs', id))));
+          showToast('Log Dibersihkan', `${total} catatan pelanggaran berhasil dihapus.`, 'success');
+        } catch (err) {
+          showToast('Gagal Membersihkan Log', err.message, 'error');
+        } finally {
+          hideLoading();
+        }
       };
     }
 
@@ -1252,6 +1537,7 @@
       e.preventDefault();
       const targetUid = document.getElementById('newAdminUid').value.trim();
       if (!targetUid) return;
+      showLoading('Menambahkan Proktor...', `Mendaftarkan UID ${targetUid}`, 'upload', true);
       try {
         await setDoc(doc(db, 'admins', targetUid), {
           uid: targetUid,
@@ -1259,21 +1545,31 @@
           createdAt: serverTimestamp()
         });
         document.getElementById('newAdminUid').value = '';
+        showToast('Proktor Ditambahkan', `UID ${targetUid} berhasil diberi akses proktor.`, 'success');
       } catch (err) {
-        alert('Gagal menambah UID Proktor: ' + err.message);
+        showToast('Gagal Menambah Proktor', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     });
 
     window.deleteAdminUid = async (uid) => {
       if (!confirm('Hapus akses proktor untuk UID ' + uid + '?')) return;
+      showLoading('Menghapus Akses Proktor...', `Mencabut akses UID ${uid}`, 'upload', true);
       try {
         await deleteDoc(doc(db, 'admins', uid));
+        showToast('Akses Proktor Dicabut', `UID ${uid} telah dihapus dari daftar proktor.`, 'success');
       } catch (err) {
-        alert('Gagal menghapus UID Proktor: ' + err.message);
+        showToast('Gagal Menghapus Proktor', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     };
 
-    async function loadGlobalSettings() {
+    async function loadGlobalSettings(showFeedback = false) {
+      if (showFeedback) {
+        showLoading('Mengunduh Pengaturan Server...', 'Membaca konfigurasi settings/global', 'download', false);
+      }
       try {
         const snap = await getDoc(doc(db, 'settings', 'global'));
         if (snap.exists()) {
@@ -1289,34 +1585,47 @@
           document.getElementById('settingEventYear').value = 'TAHUN AJARAN 2025/2026';
         }
       } catch (e) {
-        console.warn("Gagal memuat settings/global:", e);
+        showToast('Gagal Memuat Pengaturan', e.message || 'Gagal membaca konfigurasi server.', 'error');
+      } finally {
+        if (showFeedback) hideLoading();
       }
     }
 
     document.getElementById('settingsForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      showLoading('Menyimpan Pengaturan Server...', 'Mengunggah perubahan ke settings/global', 'upload', true);
       try {
+        const isOpen = document.getElementById('settingStatusUjian').checked;
         await setDoc(doc(db, 'settings', 'global'), {
-          statusUjian: document.getElementById('settingStatusUjian').checked,
+          statusUjian: isOpen,
           eventName: document.getElementById('settingEventName').value.trim(),
           eventClass: document.getElementById('settingEventClass').value.trim(),
           eventYear: document.getElementById('settingEventYear').value.trim(),
           updatedAt: serverTimestamp()
         });
-        alert("Pengaturan server berhasil disimpan!");
+        showToast(
+          'Pengaturan Server Tersimpan',
+          `Status Server Ujian: ${isOpen ? 'AKTIF (Dibuka)' : 'NONAKTIF (Ditutup)'}.`,
+          'success'
+        );
       } catch (err) {
-        alert("Gagal menyimpan pengaturan server: " + err.message);
+        showToast('Gagal Menyimpan Pengaturan', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     });
 
     document.getElementById('btnDeleteSettings').addEventListener('click', async () => {
       if (!confirm("Reset/Hapus dokumen pengaturan server ke nilai default?")) return;
+      showLoading('Mereset Pengaturan Server...', 'Mengembalikan pengaturan server ke nilai awal', 'upload', true);
       try {
         await deleteDoc(doc(db, 'settings', 'global'));
-        await loadGlobalSettings();
-        alert("Pengaturan server berhasil direset ke nilai default.");
+        await loadGlobalSettings(false);
+        showToast('Reset Pengaturan Berhasil', 'Pengaturan server berhasil dikembalikan ke nilai default.', 'success');
       } catch (err) {
-        alert("Gagal mereset pengaturan server: " + err.message);
+        showToast('Gagal Mereset Pengaturan', err.message, 'error');
+      } finally {
+        hideLoading();
       }
     });
   </script>
