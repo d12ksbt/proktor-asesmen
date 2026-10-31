@@ -27,6 +27,19 @@
     </div>
   </div>
 
+  <!-- BANNER PERINGATAN BUKAN AKUN ADMIN -->
+  <div id="nonAdminBanner" class="hidden bg-red-600 text-white px-3 py-2 shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 text-[11px]">
+      <div>
+        <strong class="font-extrabold uppercase tracking-wide">⚠️ Akun Belum Memiliki Hak Akses Admin Proktor</strong>
+        <p class="mt-0.5 text-red-100">
+          Anda login sebagai <strong id="nonAdminEmailText"></strong> (UID: <code id="nonAdminUidText" class="bg-red-800 px-1 py-0.5 rounded select-all"></code>).
+          Untuk menyimpan jadwal/mengelola peserta, silakan login menggunakan akun Admin Utama (<strong>niotron.project@gmail.com</strong>) atau daftarkan UID di atas pada menu <strong>4. Status Server &rarr; Daftar Admin Proktor</strong> menggunakan akun Admin Utama.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- HEADER -->
   <header class="bg-slate-900 text-white shadow sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -152,7 +165,7 @@
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Tingkat Kelas</label>
               <select id="examAngkatan" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md outline-none">
-                <option value="ALL">SEMUA KELAS (ALL)</option>
+                <option value="SEMUA">SEMUA KELAS</option>
                 <option value="X">Kelas X</option>
                 <option value="XI">Kelas XI</option>
                 <option value="XII">Kelas XII</option>
@@ -161,7 +174,7 @@
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Jurusan</label>
               <select id="examJurusan" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md outline-none">
-                <option value="ALL">SEMUA KONSENTRASI KEAHLIAN</option>
+                <option value="SEMUA">SEMUA KONSENTRASI KEAHLIAN</option>
                 <option value="TJKT">TJKT</option>
                 <option value="TO">TO</option>
                 <option value="TPFL">TPFL</option>
@@ -318,54 +331,93 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- TAB 4: STATUS SERVER (settings/global)     -->
+    <!-- TAB 4: STATUS SERVER & ADMIN (settings)    -->
     <!-- ========================================== -->
-    <section id="tab-settings" class="tab-panel hidden max-w-lg bg-white rounded-xl shadow-xs border border-slate-200 p-4">
-      <div class="flex items-center justify-between mb-1">
-        <h3 class="text-xs font-bold text-slate-900">Pengaturan Server &amp; Event Ujian</h3>
-        <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">settings/global</span>
+    <section id="tab-settings" class="tab-panel hidden grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Pengaturan Global Server -->
+      <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 h-fit">
+        <div class="flex items-center justify-between mb-1">
+          <h3 class="text-xs font-bold text-slate-900">Pengaturan Server &amp; Event Ujian</h3>
+          <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">settings/global</span>
+        </div>
+        <p class="text-[11px] text-slate-500 mb-3">
+          Ubah atau reset konfigurasi global aplikasi siswa. Jika Status Server dimatikan, seluruh aplikasi murid akan menampilkan layar "Akses Ditutup".
+        </p>
+
+        <form id="settingsForm" class="space-y-3">
+          <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+            <div>
+              <p class="text-xs font-bold text-slate-800">Status Server Ujian Aktif</p>
+              <p class="text-[10px] text-slate-500">Izinkan murid login dan mengakses daftar ujian</p>
+            </div>
+            <input type="checkbox" id="settingStatusUjian" checked class="w-4 h-4 text-teal-600 rounded" />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Nama Kegiatan Asesmen</label>
+            <input type="text" id="settingEventName" placeholder="PENILAIAN SUMATIF AKHIR JENJANG" required
+              class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md outline-none focus:ring-2 focus:ring-teal-500" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Sub-Judul / Target Kelas</label>
+              <input type="text" id="settingEventClass" placeholder="SMKN 1 MONDOKAN" required
+                class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md outline-none focus:ring-2 focus:ring-teal-500" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Tahun Ajaran</label>
+              <input type="text" id="settingEventYear" placeholder="TAHUN AJARAN 2025/2026" required
+                class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md outline-none focus:ring-2 focus:ring-teal-500" />
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2 pt-1">
+            <button type="submit" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-md text-xs shadow transition">
+              Simpan / Update Pengaturan Server
+            </button>
+            <button type="button" id="btnDeleteSettings" class="bg-red-50 hover:bg-red-100 text-red-700 font-bold px-3 py-2 rounded-md text-[11px] border border-red-200 transition">
+              Hapus / Reset ke Default
+            </button>
+          </div>
+        </form>
       </div>
-      <p class="text-[11px] text-slate-500 mb-3">
-        Ubah atau reset konfigurasi global aplikasi siswa. Jika Status Server dimatikan, seluruh aplikasi murid akan menampilkan layar "Akses Ditutup".
-      </p>
 
-      <form id="settingsForm" class="space-y-3">
-        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-          <div>
-            <p class="text-xs font-bold text-slate-800">Status Server Ujian Aktif</p>
-            <p class="text-[10px] text-slate-500">Izinkan murid login dan mengakses daftar ujian</p>
-          </div>
-          <input type="checkbox" id="settingStatusUjian" checked class="w-4 h-4 text-teal-600 rounded" />
+      <!-- Manajemen UID Proktor Tambahan (Koleksi: admins) -->
+      <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 h-fit">
+        <div class="flex items-center justify-between mb-1">
+          <h3 class="text-xs font-bold text-slate-900">Manajemen Akses Proktor Tambahan</h3>
+          <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">admins/{uid}</span>
         </div>
+        <p class="text-[11px] text-slate-500 mb-3">
+          Akun Admin Utama adalah <strong>niotron.project@gmail.com</strong>. Jika ada proktor lain yang login dengan akun Google berbeda, tambahkan <strong>UID Firebase</strong> mereka di bawah ini agar dapat menyimpan jadwal dan mereset peserta.
+        </p>
 
-        <div>
-          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Nama Kegiatan Asesmen</label>
-          <input type="text" id="settingEventName" placeholder="PENILAIAN SUMATIF AKHIR JENJANG" required
-            class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md outline-none focus:ring-2 focus:ring-teal-500" />
-        </div>
-
-        <div class="grid grid-cols-2 gap-2.5">
-          <div>
-            <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Sub-Judul / Target Kelas</label>
-            <input type="text" id="settingEventClass" placeholder="SMKN 1 MONDOKAN" required
-              class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md outline-none focus:ring-2 focus:ring-teal-500" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Tahun Ajaran</label>
-            <input type="text" id="settingEventYear" placeholder="TAHUN AJARAN 2025/2026" required
-              class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md outline-none focus:ring-2 focus:ring-teal-500" />
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-2 pt-1">
-          <button type="submit" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-md text-xs shadow transition">
-            Simpan / Update Pengaturan Server
+        <form id="adminAddForm" class="flex gap-2 mb-3">
+          <input type="text" id="newAdminUid" placeholder="Masukkan UID Firebase Proktor..." required
+            class="flex-1 px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md outline-none focus:ring-2 focus:ring-teal-500" />
+          <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-3 py-1.5 rounded-md text-xs shadow transition whitespace-nowrap">
+            + Tambah Proktor
           </button>
-          <button type="button" id="btnDeleteSettings" class="bg-red-50 hover:bg-red-100 text-red-700 font-bold px-3 py-2 rounded-md text-[11px] border border-red-200 transition">
-            Hapus / Reset ke Default
-          </button>
+        </form>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-[11px]">
+            <thead>
+              <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 uppercase text-[10px]">
+                <th class="py-1.5 px-2.5">UID Proktor</th>
+                <th class="py-1.5 px-2.5">Role</th>
+                <th class="py-1.5 px-2.5 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="adminsTableBody" class="divide-y divide-slate-200">
+              <tr>
+                <td colspan="3" class="py-4 text-center text-slate-400">Belum ada UID proktor tambahan.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </form>
+      </div>
     </section>
 
   </main>
@@ -535,13 +587,53 @@
       return `${dd}-${mm}-${yyyy}`;
     }
 
-    document.getElementById('todayDateDisplay').textContent = getTodayFormatted();
-    document.getElementById('btnSetToday').addEventListener('click', () => {
-      document.getElementById('examDate').value = getTodayFormatted();
+    // Normalisasi otomatis format tanggal ke DD-MM-YYYY agar selalu lolos validasi Firestore Rules
+    function normalizeDateToDDMMYYYY(raw) {
+      const clean = (raw || '').trim().replace(/[/.]/g, '-');
+      // Jika sudah D-M-YYYY atau DD-MM-YYYY
+      const dmy = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(clean);
+      if (dmy) {
+        const dd = dmy[1].padStart(2, '0');
+        const mm = dmy[2].padStart(2, '0');
+        const yyyy = dmy[3];
+        return `${dd}-${mm}-${yyyy}`;
+      }
+      // Jika YYYY-MM-DD
+      const ymd = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(clean);
+      if (ymd) {
+        const yyyy = ymd[1];
+        const mm = ymd[2].padStart(2, '0');
+        const dd = ymd[3].padStart(2, '0');
+        return `${dd}-${mm}-${yyyy}`;
+      }
+      return clean;
+    }
+
+    function getHariTanggalFromDDMMYYYY(ddmmyyyy) {
+      const m = /^(\d{2})-(\d{2})-(\d{4})$/.exec(ddmmyyyy);
       const hariList = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
       const bulanList = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-      const d = new Date();
-      document.getElementById('examHariTanggal').value = `${hariList[d.getDay()]}, ${d.getDate()} ${bulanList[d.getMonth()]} ${d.getFullYear()}`;
+      const d = m ? new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])) : new Date();
+      if (isNaN(d.getTime())) return ddmmyyyy;
+      return `${hariList[d.getDay()]}, ${d.getDate()} ${bulanList[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function fillTodayDateFields() {
+      const today = getTodayFormatted();
+      document.getElementById('examDate').value = today;
+      document.getElementById('examHariTanggal').value = getHariTanggalFromDDMMYYYY(today);
+    }
+
+    document.getElementById('todayDateDisplay').textContent = getTodayFormatted();
+    fillTodayDateFields();
+
+    document.getElementById('btnSetToday').addEventListener('click', fillTodayDateFields);
+    document.getElementById('examDate').addEventListener('blur', (e) => {
+      const norm = normalizeDateToDDMMYYYY(e.target.value);
+      e.target.value = norm;
+      if (/^\d{2}-\d{2}-\d{4}$/.test(norm)) {
+        document.getElementById('examHariTanggal').value = getHariTanggalFromDDMMYYYY(norm);
+      }
     });
 
     // Tab Navigation
@@ -590,6 +682,7 @@
     let unsubExams = null;
     let unsubUsers = null;
     let unsubLogs = null;
+    let unsubAdmins = null;
     let cachedExams = new Map();
     let cachedUsers = [];
     let cachedLogs = new Map();
@@ -603,11 +696,11 @@
     const examJurusanInput = document.getElementById('examJurusan');
 
     function generateAutoExamId() {
-      if (editingExamId) return; // Jangan ubah ID saat sedang mode Edit
+      if (editingExamId) return;
       const rawMapel = examMapelInput.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
       const prefix = rawMapel ? rawMapel.substring(0, 6) : 'UJIAN';
-      const angkatan = examAngkatanInput.value || 'ALL';
-      const jurusan = examJurusanInput.value || 'ALL';
+      const angkatan = examAngkatanInput.value || 'SEMUA';
+      const jurusan = examJurusanInput.value || 'SEMUA';
       examIdInput.value = `${prefix}-${angkatan}-${jurusan}-${currentRandomSuffix}`;
     }
 
@@ -615,6 +708,32 @@
     examAngkatanInput.addEventListener('change', generateAutoExamId);
     examJurusanInput.addEventListener('change', generateAutoExamId);
     generateAutoExamId();
+
+    async function checkAdminPermissionBanner(user) {
+      const nonAdminBanner = document.getElementById('nonAdminBanner');
+      if (!user) {
+        nonAdminBanner.classList.add('hidden');
+        return;
+      }
+      if (user.email === 'niotron.project@gmail.com') {
+        nonAdminBanner.classList.add('hidden');
+        return;
+      }
+      try {
+        const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+        if (adminDoc.exists()) {
+          nonAdminBanner.classList.add('hidden');
+        } else {
+          document.getElementById('nonAdminEmailText').textContent = user.email || 'Tanpa Email';
+          document.getElementById('nonAdminUidText').textContent = user.uid;
+          nonAdminBanner.classList.remove('hidden');
+        }
+      } catch {
+        document.getElementById('nonAdminEmailText').textContent = user.email || 'Tanpa Email';
+        document.getElementById('nonAdminUidText').textContent = user.uid;
+        nonAdminBanner.classList.remove('hidden');
+      }
+    }
 
     onAuthStateChanged(auth, async (user) => {
       const authStatusText = document.getElementById('authStatusText');
@@ -629,6 +748,7 @@
         btnLogout.classList.remove('hidden');
         loginGate.classList.add('hidden');
         adminMain.classList.remove('hidden');
+        await checkAdminPermissionBanner(user);
         startRealtimeListeners();
         loadGlobalSettings();
       } else {
@@ -637,9 +757,11 @@
         btnLogout.classList.add('hidden');
         loginGate.classList.remove('hidden');
         adminMain.classList.add('hidden');
+        document.getElementById('nonAdminBanner').classList.add('hidden');
         if (unsubExams) unsubExams();
         if (unsubUsers) unsubUsers();
         if (unsubLogs) unsubLogs();
+        if (unsubAdmins) unsubAdmins();
       }
     });
 
@@ -677,8 +799,8 @@
       document.getElementById('examHariTanggal').value = ex.hariTanggal || '';
       document.getElementById('examMulai').value = ex.mulai || '';
       document.getElementById('examSelesai').value = ex.selesai || '';
-      examAngkatanInput.value = ex.angkatan || 'ALL';
-      examJurusanInput.value = ex.jurusan || 'ALL';
+      examAngkatanInput.value = (ex.angkatan === 'ALL' ? 'SEMUA' : ex.angkatan) || 'SEMUA';
+      examJurusanInput.value = (ex.jurusan === 'ALL' ? 'SEMUA' : ex.jurusan) || 'SEMUA';
       document.getElementById('examLinkSoal').value = ex.linkSoal || '';
       document.getElementById('examIsActive').checked = ex.isActive !== false;
 
@@ -716,15 +838,23 @@
       if (!editingExamId && !examIdInput.value.trim()) {
         generateAutoExamId();
       }
-      const id = examIdInput.value.trim();
-      const mapel = examMapelInput.value.trim();
-      const examDate = document.getElementById('examDate').value.trim();
-      const hariTanggal = document.getElementById('examHariTanggal').value.trim();
-      const mulai = document.getElementById('examMulai').value.trim();
-      const selesai = document.getElementById('examSelesai').value.trim();
-      const angkatan = examAngkatanInput.value;
-      const jurusan = examJurusanInput.value;
-      const linkSoal = document.getElementById('examLinkSoal').value.trim();
+      const id = examIdInput.value.trim().replace(/[^a-zA-Z0-9_-]/g, '-');
+      const mapel = examMapelInput.value.trim().slice(0, 150);
+      const examDate = normalizeDateToDDMMYYYY(document.getElementById('examDate').value);
+      document.getElementById('examDate').value = examDate;
+
+      if (!/^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-[0-9]{4}$/.test(examDate)) {
+        alert('Format Tanggal wajib DD-MM-YYYY (contoh: 30-10-2026).');
+        return;
+      }
+
+      const rawHariTanggal = document.getElementById('examHariTanggal').value.trim();
+      const hariTanggal = (rawHariTanggal || getHariTanggalFromDDMMYYYY(examDate)).slice(0, 100);
+      const mulai = document.getElementById('examMulai').value.trim().slice(0, 20);
+      const selesai = document.getElementById('examSelesai').value.trim().slice(0, 20);
+      const angkatan = examAngkatanInput.value || 'SEMUA';
+      const jurusan = examJurusanInput.value || 'SEMUA';
+      const linkSoal = document.getElementById('examLinkSoal').value.trim().slice(0, 500);
       const isActive = document.getElementById('examIsActive').checked;
 
       try {
@@ -761,7 +891,11 @@
           resetExamFormMode();
         }
       } catch (err) {
-        alert("Gagal menyimpan jadwal (Pastikan akun Anda adalah Admin Proktor): " + err.message);
+        alert(
+          "Gagal menyimpan jadwal: " + err.message +
+          "\n\nPastikan Anda login dengan email Admin Proktor (niotron.project@gmail.com) atau UID Anda (" +
+          (auth.currentUser?.uid || '-') + ") sudah didaftarkan di menu 4. Status Server -> Manajemen Akses Proktor."
+        );
       }
     });
 
@@ -978,7 +1112,7 @@
     };
 
     // ====================================================
-    // 4. REALTIME LISTENERS (EXAMS, USERS, CHEAT_LOGS)
+    // 4. REALTIME LISTENERS (EXAMS, USERS, CHEAT_LOGS, ADMINS)
     // ====================================================
     function startRealtimeListeners() {
       const todayStr = getTodayFormatted();
@@ -1021,7 +1155,7 @@
               </td>
               <td class="py-2 px-2.5 font-mono font-semibold text-slate-700">${ex.mulai} - ${ex.selesai}</td>
               <td class="py-2 px-2.5">
-                <span class="px-1.5 py-0.5 bg-slate-100 rounded font-bold text-slate-700 text-[10px]">${ex.angkatan || 'ALL'} &bull; ${ex.jurusan || 'ALL'}</span>
+                <span class="px-1.5 py-0.5 bg-slate-100 rounded font-bold text-slate-700 text-[10px]">${ex.angkatan || 'SEMUA'} &bull; ${ex.jurusan || 'SEMUA'}</span>
               </td>
               <td class="py-2 px-2.5 text-right space-x-1 whitespace-nowrap">
                 <button onclick="window.editExam('${ex.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-200 transition">
@@ -1081,6 +1215,29 @@
         }).join('');
       });
 
+      // D. Listener Daftar Admin Proktor (admins)
+      unsubAdmins = onSnapshot(collection(db, 'admins'), (snap) => {
+        const tbody = document.getElementById('adminsTableBody');
+        if (snap.empty) {
+          tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400">Belum ada UID proktor tambahan.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = snap.docs.map(d => {
+          const adm = d.data();
+          return `
+            <tr class="hover:bg-slate-50">
+              <td class="py-1.5 px-2.5 font-mono font-bold text-slate-800">${adm.uid || d.id}</td>
+              <td class="py-1.5 px-2.5 uppercase text-[10px] font-bold text-teal-700">${adm.role || 'proktor'}</td>
+              <td class="py-1.5 px-2.5 text-right">
+                <button onclick="window.deleteAdminUid('${d.id}')" class="bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded border border-red-200">
+                  Hapus
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }, () => {});
+
       document.getElementById('btnClearLogs').onclick = async () => {
         if (cachedLogs.size === 0) return;
         if (!confirm("Hapus semua catatan log pelanggaran?")) return;
@@ -1089,8 +1246,33 @@
     }
 
     // ====================================================
-    // 5. PENGATURAN SERVER GLOBAL (SIMPAN/EDIT & HAPUS/RESET)
+    // 5. PENGATURAN SERVER GLOBAL & TAMBAH ADMIN PROKTOR
     // ====================================================
+    document.getElementById('adminAddForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const targetUid = document.getElementById('newAdminUid').value.trim();
+      if (!targetUid) return;
+      try {
+        await setDoc(doc(db, 'admins', targetUid), {
+          uid: targetUid,
+          role: 'proktor',
+          createdAt: serverTimestamp()
+        });
+        document.getElementById('newAdminUid').value = '';
+      } catch (err) {
+        alert('Gagal menambah UID Proktor: ' + err.message);
+      }
+    });
+
+    window.deleteAdminUid = async (uid) => {
+      if (!confirm('Hapus akses proktor untuk UID ' + uid + '?')) return;
+      try {
+        await deleteDoc(doc(db, 'admins', uid));
+      } catch (err) {
+        alert('Gagal menghapus UID Proktor: ' + err.message);
+      }
+    };
+
     async function loadGlobalSettings() {
       try {
         const snap = await getDoc(doc(db, 'settings', 'global'));
