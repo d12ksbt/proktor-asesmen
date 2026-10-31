@@ -247,24 +247,23 @@
                 <button type="button" onclick="window.setJadwalJurusanFilter('BUSANA')" id="btnJadwalJurusan-BUSANA" class="jadwal-jurusan-btn px-3 py-1 rounded-lg font-bold text-[11px] bg-pink-50 border border-pink-200 text-pink-800 hover:bg-pink-100 transition flex items-center justify-center text-center">BUSANA</button>
                 <button type="button" onclick="window.setJadwalJurusanFilter('TJKT')" id="btnJadwalJurusan-TJKT" class="jadwal-jurusan-btn px-3 py-1 rounded-lg font-bold text-[11px] bg-violet-50 border border-violet-200 text-violet-800 hover:bg-violet-100 transition flex items-center justify-center text-center">TJKT</button>
               </div>
-              <input type="text" id="searchScheduleInput" placeholder="Cari mapel / token / ID..." class="px-2.5 py-1 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none w-full sm:w-52" />
+              <input type="text" id="searchScheduleInput" placeholder="Cari mapel / ID..." class="px-2.5 py-1 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none w-full sm:w-52" />
             </div>
 
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead>
                   <tr class="bg-slate-50 text-slate-600 text-[10px] uppercase tracking-wider border-b border-slate-200">
-                    <th class="py-2.5 px-3 font-bold">Status Aktif</th>
                     <th class="py-2.5 px-3 font-bold">ID & Mapel</th>
                     <th class="py-2.5 px-3 font-bold">Kelas / Konsentrasi</th>
                     <th class="py-2.5 px-3 font-bold">Waktu Pelaksanaan</th>
-                    <th class="py-2.5 px-3 font-bold">Token & Durasi</th>
+                    <th class="py-2.5 px-3 font-bold text-center">Status Aktif</th>
                     <th class="py-2.5 px-3 font-bold text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="scheduleTableBody" class="divide-y divide-slate-200 text-[11px]">
                   <tr>
-                    <td colspan="6" class="py-6 text-center text-slate-400">Memuat jadwal ujian...</td>
+                    <td colspan="5" class="py-6 text-center text-slate-400">Memuat jadwal ujian...</td>
                   </tr>
                 </tbody>
               </table>
@@ -669,15 +668,9 @@
         <button type="button" onclick="window.closeEditScheduleModal()" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-700 font-bold flex items-center justify-center text-center transition">&times;</button>
       </div>
       <form id="editScheduleForm" class="space-y-2.5">
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">ID Jadwal</label>
-            <input type="text" id="modalExamId" readonly class="w-full px-2.5 py-1.5 border border-slate-200 bg-slate-100 rounded-lg text-[11px] font-mono text-slate-600 outline-none" />
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Token Ujian *</label>
-            <input type="text" id="modalExamToken" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] font-mono uppercase focus:ring-2 focus:ring-teal-500 outline-none" />
-          </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">ID Jadwal</label>
+          <input type="text" id="modalExamId" readonly class="w-full px-2.5 py-1.5 border border-slate-200 bg-slate-100 rounded-lg text-[11px] font-mono text-slate-600 outline-none" />
         </div>
 
         <div>
@@ -721,19 +714,8 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Durasi (Menit) *</label>
-            <input type="number" id="modalExamDuration" required min="5" max="300" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-2 focus:ring-teal-500 outline-none" />
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Maks Pelanggaran *</label>
-            <input type="number" id="modalExamMaxViolations" required min="1" max="20" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-2 focus:ring-teal-500 outline-none" />
-          </div>
-        </div>
-
         <div>
-          <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Link Google Form / Soal *</label>
+          <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Link / URL Soal *</label>
           <input type="url" id="modalExamUrl" required class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] focus:ring-2 focus:ring-teal-500 outline-none" />
         </div>
 
@@ -1557,7 +1539,6 @@
         const matchSearch =
           mapel.toLowerCase().includes(keyword) ||
           (s.id || "").toLowerCase().includes(keyword) ||
-          (s.token || "").toLowerCase().includes(keyword) ||
           (s.jurusan || "").toLowerCase().includes(keyword);
         return matchKls && matchJur && matchSearch;
       });
@@ -1571,7 +1552,7 @@
       if (filtered.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="6" class="py-8 text-center text-slate-400">
+            <td colspan="5" class="py-8 text-center text-slate-400">
               Belum ada jadwal tersimpan untuk <strong>Kelas ${selectedAngkatan}</strong> (${jadwalJurusanFilter === "ALL" ? "Semua Konsentrasi" : jadwalJurusanFilter}).
               <br/>
               <button onclick="window.switchMenuTab('tambah-jadwal')" class="mt-2 px-3.5 py-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-lg font-bold text-[10px] hover:from-indigo-700 hover:to-blue-700 inline-flex items-center justify-center text-center shadow-sm">+ Buat Jadwal Sekarang</button>
@@ -1590,21 +1571,9 @@
         const dateLabel = escapeHtml(item.hariTanggal || item.examDate || item.date || "-");
         const startLabel = escapeHtml(item.mulai || item.startTime || "-");
         const endLabel = escapeHtml(item.selesai || item.endTime || "-");
-        const tokenLabel = escapeHtml(item.token || "-");
-        const durasiLabel = item.durationMinutes || 90;
 
         return `
           <tr class="hover:bg-slate-50 transition">
-            <td class="py-2.5 px-3">
-              <button type="button" onclick="window.toggleScheduleActive('${safeId}', ${!isActive})" class="inline-flex items-center justify-center text-center gap-2 px-3 py-1 rounded-full font-extrabold text-[10px] transition shadow-sm ${
-                isActive
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700"
-                  : "bg-slate-200 text-slate-700 hover:bg-slate-300"
-              }" title="Klik untuk mengubah status aktif jadwal">
-                <span class="w-2 h-2 rounded-full ${isActive ? "bg-white animate-pulse" : "bg-slate-500"}"></span>
-                <span>${isActive ? "AKTIF" : "NONAKTIF"}</span>
-              </button>
-            </td>
             <td class="py-2.5 px-3">
               <p class="font-bold text-slate-900 text-[11px]">${mapelLabel}</p>
               <p class="text-[10px] font-mono text-slate-400">${safeId}</p>
@@ -1616,9 +1585,15 @@
               <p class="font-semibold text-slate-800">${dateLabel}</p>
               <p class="text-[10px] text-slate-500">${startLabel} - ${endLabel}</p>
             </td>
-            <td class="py-2.5 px-3">
-              <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded font-mono font-extrabold text-[10px]">${tokenLabel}</span>
-              <span class="text-[10px] text-slate-500 ml-1">${durasiLabel} mnt</span>
+            <td class="py-2.5 px-3 text-center">
+              <button type="button" onclick="window.toggleScheduleActive('${safeId}', ${!isActive})" class="inline-flex items-center justify-center text-center gap-2 px-3 py-1 rounded-full font-extrabold text-[10px] transition shadow-sm ${
+                isActive
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700"
+                  : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+              }" title="Klik untuk mengubah status aktif jadwal">
+                <span class="w-2 h-2 rounded-full ${isActive ? "bg-white animate-pulse" : "bg-slate-500"}"></span>
+                <span>${isActive ? "AKTIF" : "NONAKTIF"}</span>
+              </button>
             </td>
             <td class="py-2.5 px-3 text-center">
               <div class="flex items-center justify-center gap-1.5">
@@ -1651,7 +1626,6 @@
       if (!item) return;
 
       document.getElementById("modalExamId").value = item.id;
-      document.getElementById("modalExamToken").value = item.token || generateRandomToken();
       document.getElementById("modalExamSubject").value = item.mapel || item.subject || "";
       document.getElementById("modalExamAngkatan").value = selectedAngkatan || item.angkatan || "X";
       document.getElementById("modalExamAngkatan").disabled = true;
@@ -1659,8 +1633,6 @@
       document.getElementById("modalExamDate").value = ddmmyyyyToIso(item.examDate || item.date || todayIso);
       document.getElementById("modalExamStartTime").value = item.mulai || item.startTime || "07:30";
       document.getElementById("modalExamEndTime").value = item.selesai || item.endTime || "09:00";
-      document.getElementById("modalExamDuration").value = item.durationMinutes || 90;
-      document.getElementById("modalExamMaxViolations").value = item.maxViolations || 3;
       document.getElementById("modalExamUrl").value = item.linkSoal || item.formUrl || "";
 
       document.getElementById("editScheduleModal").classList.remove("hidden");
@@ -1687,9 +1659,6 @@
         hariTanggal: hariTanggal.slice(0, 100),
         mulai: document.getElementById("modalExamStartTime").value.trim().slice(0, 20),
         selesai: document.getElementById("modalExamEndTime").value.trim().slice(0, 20),
-        durationMinutes: Number(document.getElementById("modalExamDuration").value) || 90,
-        token: document.getElementById("modalExamToken").value.trim().toUpperCase().slice(0, 30),
-        maxViolations: Number(document.getElementById("modalExamMaxViolations").value) || 3,
         linkSoal: document.getElementById("modalExamUrl").value.trim().slice(0, 500),
         updatedAt: serverTimestamp()
       };
@@ -1755,7 +1724,6 @@
       const idx = Math.min(currentRowsCount - 1, defaultStartTimes.length - 1);
 
       const rowId = `sessionRow_${sessionRowCounter}`;
-      const initialToken = preset.token || generateRandomToken();
       const initialId = preset.id || generateRowScheduleId(currentRowsCount, preset.subject || "");
 
       const div = document.createElement("div");
@@ -1775,44 +1743,25 @@
         <input type="hidden" class="row-schedule-id" value="${initialId}" />
 
         <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-          <div class="sm:col-span-5">
+          <div class="sm:col-span-6">
             <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Mata Pelajaran *</label>
             <input type="text" required placeholder="Contoh: Bahasa Indonesia" value="${escapeHtml(preset.subject || "")}" class="row-subject w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
           </div>
 
-          <div class="sm:col-span-2">
+          <div class="sm:col-span-3">
             <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Jam Mulai *</label>
             <input type="time" required value="${preset.startTime || defaultStartTimes[idx]}" class="row-start-time w-full px-2 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
           </div>
 
-          <div class="sm:col-span-2">
+          <div class="sm:col-span-3">
             <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Jam Selesai *</label>
             <input type="time" required value="${preset.endTime || defaultEndTimes[idx]}" class="row-end-time w-full px-2 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
           </div>
-
-          <div class="sm:col-span-1">
-            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Menit *</label>
-            <input type="number" required min="5" max="300" value="${preset.durationMinutes || 90}" class="row-duration w-full px-2 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
-          </div>
-
-          <div class="sm:col-span-2">
-            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Token Ujian *</label>
-            <div class="flex gap-1">
-              <input type="text" required value="${initialToken}" class="row-token w-full px-2 py-1.5 border border-slate-300 rounded-lg text-[11px] font-mono uppercase bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
-              <button type="button" onclick="window.regenerateRowToken('${rowId}')" class="px-2 py-1 bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white rounded-lg font-bold text-[10px] flex items-center justify-center text-center shadow-sm" title="Acak Token">↻</button>
-            </div>
-          </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-          <div class="sm:col-span-10">
-            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Link / URL Soal *</label>
-            <input type="url" required placeholder="https://docs.google.com/forms/d/e/.../viewform" value="${escapeHtml(preset.formUrl || "")}" class="row-url w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
-          </div>
-          <div class="sm:col-span-2">
-            <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Maks Pelanggaran *</label>
-            <input type="number" required min="1" max="20" value="${preset.maxViolations || 3}" class="row-max-violations w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
-          </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Link / URL Soal *</label>
+          <input type="url" required placeholder="https://docs.google.com/forms/d/e/.../viewform" value="${escapeHtml(preset.formUrl || "")}" class="row-url w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
         </div>
       `;
 
@@ -1838,12 +1787,6 @@
       const target = document.getElementById(rowId);
       if (target) target.remove();
       renumberSessionRows();
-    };
-
-    window.regenerateRowToken = (rowId) => {
-      const row = document.getElementById(rowId);
-      if (!row) return;
-      row.querySelector(".row-token").value = generateRandomToken();
     };
 
     function renumberSessionRows() {
@@ -1897,10 +1840,7 @@
           const mapel = card.querySelector(".row-subject").value.trim().slice(0, 150);
           const mulai = card.querySelector(".row-start-time").value.trim().slice(0, 20);
           const selesai = card.querySelector(".row-end-time").value.trim().slice(0, 20);
-          const durationMinutes = Number(card.querySelector(".row-duration").value) || 90;
-          const token = card.querySelector(".row-token").value.trim().toUpperCase().slice(0, 30);
           const linkSoal = card.querySelector(".row-url").value.trim().slice(0, 500);
-          const maxViolations = Number(card.querySelector(".row-max-violations").value) || 3;
 
           await setDoc(doc(db, "exams", id), {
             id,
@@ -1913,9 +1853,6 @@
             angkatan,
             jurusan,
             isActive: true,
-            token,
-            durationMinutes,
-            maxViolations,
             authorId: auth.currentUser.uid,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
