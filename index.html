@@ -12,12 +12,12 @@
       font-size: 11px;
     }
     @keyframes progressIndeterminate {
-      0% { transform: translateX(-100%) scaleX(0.2); }
-      50% { transform: translateX(0%) scaleX(0.5); }
-      100% { transform: translateX(100%) scaleX(0.2); }
+      0% { transform: translateX(-100%) scaleX(0.25); }
+      50% { transform: translateX(0%) scaleX(0.55); }
+      100% { transform: translateX(100%) scaleX(0.25); }
     }
     .animate-progress-bar {
-      animation: progressIndeterminate 1.2s infinite linear;
+      animation: progressIndeterminate 1.1s infinite linear;
       transform-origin: left;
     }
     @keyframes slideInRight {
@@ -32,20 +32,21 @@
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col text-[11px]">
 
   <!-- TOP PROGRESS BAR ANIMATION (AKTIF SAAT UPLOAD / DOWNLOAD DATA) -->
-  <div id="topLoadingBar" class="hidden fixed top-0 left-0 right-0 h-1 bg-teal-950 overflow-hidden z-50">
-    <div id="topLoadingBarInner" class="h-full w-full bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-400 animate-progress-bar"></div>
+  <div id="topLoadingBar" class="hidden fixed top-0 left-0 right-0 h-1.5 bg-teal-950 overflow-hidden z-50 shadow">
+    <div id="topLoadingBarInner" class="h-full w-full bg-gradient-to-r from-teal-400 via-emerald-300 to-cyan-400 animate-progress-bar"></div>
   </div>
 
-  <!-- FLOATING LOADING PILL / OVERLAY INDICATOR (UPLOAD & DOWNLOAD) -->
-  <div id="loadingOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/35 backdrop-blur-[1px] flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl border border-slate-200 px-5 py-4 flex items-center space-x-3.5 max-w-xs w-full">
-      <div class="relative flex items-center justify-center">
-        <div class="w-8 h-8 rounded-full border-3 border-slate-200 border-t-teal-600 animate-spin"></div>
-        <span id="loadingDirectionIcon" class="absolute text-[10px] font-extrabold text-teal-700">↑</span>
+  <!-- MODAL OVERLAY ANIMASI LOADING TENGAH LAYAR (UPLOAD & DOWNLOAD) -->
+  <div id="loadingOverlay" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-[2px] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 px-6 py-5 flex flex-col items-center text-center max-w-xs w-full">
+      <div class="relative flex items-center justify-center mb-3">
+        <div class="w-12 h-12 rounded-full border-4 border-teal-100 border-t-teal-600 animate-spin"></div>
+        <span id="loadingDirectionIcon" class="absolute text-sm font-black text-teal-700">↑</span>
       </div>
-      <div class="flex-1 min-w-0">
-        <p id="loadingTitle" class="text-xs font-bold text-slate-900 truncate">Memproses Data...</p>
-        <p id="loadingSubtitle" class="text-[10px] text-slate-500 truncate">Menghubungkan ke Cloud Firestore</p>
+      <p id="loadingTitle" class="text-xs font-extrabold text-slate-900">Memproses Data...</p>
+      <p id="loadingSubtitle" class="text-[11px] text-slate-500 mt-1">Menghubungkan ke Cloud Firestore</p>
+      <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-3">
+        <div class="h-full w-full bg-teal-600 animate-progress-bar"></div>
       </div>
     </div>
   </div>
@@ -99,15 +100,17 @@
 
       <!-- AUTH BAR -->
       <div id="authSection" class="flex items-center space-x-2">
-        <button id="btnRefreshData" title="Download & Sinkronkan Ulang Data" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold px-2.5 py-1.5 rounded-md border border-slate-700 transition flex items-center gap-1">
-          <span id="refreshIcon" class="inline-block">↻</span>
-          <span>Muat Ulang Data</span>
+        <button id="btnRefreshData" title="Refresh & Unduh Ulang Semua Data" class="hidden bg-teal-700 hover:bg-teal-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-md border border-teal-500 shadow transition flex items-center gap-1.5">
+          <svg id="refreshIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>Refresh Data</span>
         </button>
         <span id="authStatusText" class="text-[10px] bg-slate-800 px-2.5 py-1 rounded-md text-slate-300 border border-slate-700">
           Belum Login
         </span>
-        <button id="btnLoginGoogle" class="bg-teal-600 hover:bg-teal-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-md shadow transition">
-          Login Google (Proktor)
+        <button id="btnLoginGoogle" class="bg-teal-600 hover:bg-teal-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-md shadow transition flex items-center gap-1.5">
+          <span>Login Google (Proktor)</span>
         </button>
         <button id="btnLogout" class="hidden bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-md shadow transition">
           Keluar
@@ -135,21 +138,40 @@
   </div>
 
   <!-- MAIN CONTENT (HIDDEN UNTIL ADMIN LOGGED IN) -->
-  <main id="adminMain" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 py-4 space-y-4">
+  <main id="adminMain" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 py-4 space-y-3">
 
-    <!-- NAVIGATION TABS -->
-    <div class="flex flex-wrap gap-1.5 border-b border-slate-200 pb-2.5">
-      <button data-tab="tab-exams" class="tab-btn bg-teal-700 text-white px-3 py-1.5 rounded-md text-xs font-bold shadow-xs transition">
-        1. Jadwal Ujian
-      </button>
-      <button data-tab="tab-users" class="tab-btn bg-white text-slate-700 hover:bg-slate-100 px-3 py-1.5 rounded-md text-xs font-bold border border-slate-200 transition">
-        2. Peserta &amp; Status Mengerjakan
-      </button>
-      <button data-tab="tab-logs" class="tab-btn bg-white text-slate-700 hover:bg-slate-100 px-3 py-1.5 rounded-md text-xs font-bold border border-slate-200 transition">
-        3. Log Pelanggaran
-      </button>
-      <button data-tab="tab-settings" class="tab-btn bg-white text-slate-700 hover:bg-slate-100 px-3 py-1.5 rounded-md text-xs font-bold border border-slate-200 transition">
-        4. Status Server
+    <!-- INLINE NOTIFICATION STATUS BAR (NOTIFIKASI SUKSES / GAGAL DI DALAM PANEL) -->
+    <div id="inlineStatusAlert" class="hidden rounded-lg px-3.5 py-2.5 border flex items-center justify-between gap-2 shadow-xs">
+      <div class="flex items-center gap-2">
+        <span id="inlineStatusIcon" class="w-5 h-5 rounded-full flex items-center justify-center font-extrabold text-xs shrink-0">✓</span>
+        <div>
+          <span id="inlineStatusTitle" class="font-extrabold text-xs">Berhasil</span>
+          <span class="mx-1">&bull;</span>
+          <span id="inlineStatusMessage" class="text-[11px]">Operasi berhasil dilakukan.</span>
+        </div>
+      </div>
+      <button type="button" id="btnCloseInlineAlert" class="text-xs font-bold opacity-70 hover:opacity-100 px-1">&times;</button>
+    </div>
+
+    <!-- NAVIGATION TABS + TOMBOL REFRESH CEPAT -->
+    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+      <div class="flex flex-wrap gap-1.5">
+        <button data-tab="tab-exams" class="tab-btn bg-teal-700 text-white px-3 py-1.5 rounded-md text-xs font-bold shadow-xs transition">
+          1. Jadwal Ujian
+        </button>
+        <button data-tab="tab-users" class="tab-btn bg-white text-slate-700 hover:bg-slate-100 px-3 py-1.5 rounded-md text-xs font-bold border border-slate-200 transition">
+          2. Peserta &amp; Status Mengerjakan
+        </button>
+        <button data-tab="tab-logs" class="tab-btn bg-white text-slate-700 hover:bg-slate-100 px-3 py-1.5 rounded-md text-xs font-bold border border-slate-200 transition">
+          3. Log Pelanggaran
+        </button>
+        <button data-tab="tab-settings" class="tab-btn bg-white text-slate-700 hover:bg-slate-100 px-3 py-1.5 rounded-md text-xs font-bold border border-slate-200 transition">
+          4. Status Server
+        </button>
+      </div>
+
+      <button type="button" onclick="window.triggerManualRefresh(this)" class="bg-white hover:bg-teal-50 text-teal-700 border border-teal-300 px-3 py-1.5 rounded-md text-xs font-bold shadow-xs transition flex items-center gap-1.5">
+        <span>↻ Refresh Halaman Panel</span>
       </button>
     </div>
 
@@ -265,10 +287,13 @@
             <h3 class="text-xs font-bold text-slate-900">Daftar Jadwal Ujian Aktif</h3>
             <p class="text-[11px] text-slate-500">Tanggal Perangkat Hari Ini: <strong id="todayDateDisplay" class="font-mono text-teal-700"></strong></p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-1.5">
             <span id="examCountBadge" class="text-[10px] font-bold bg-teal-50 text-teal-700 px-2.5 py-0.5 rounded-full border border-teal-200">
               0 Jadwal
             </span>
+            <button type="button" onclick="window.triggerManualRefresh(this)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-md border border-slate-300 transition">
+              ↻ Refresh
+            </button>
             <button id="btnDeleteAllExams" class="bg-red-50 hover:bg-red-100 text-red-700 text-[11px] font-bold px-2.5 py-1 rounded-md border border-red-200 transition">
               Hapus Semua Jadwal
             </button>
@@ -321,6 +346,9 @@
             <option value="SELESAI">Selesai (2)</option>
             <option value="IDLE">Belum Mulai (0)</option>
           </select>
+          <button type="button" onclick="window.triggerManualRefresh(this)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-md border border-slate-300 transition">
+            ↻ Refresh
+          </button>
           <button id="btnResetAllLocked" class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-md shadow-xs transition">
             Reset Semua Murid Terkunci
           </button>
@@ -362,9 +390,14 @@
           <h3 class="text-xs font-bold text-slate-900">Log Pelanggaran</h3>
           <p class="text-[11px] text-slate-500">Mencatat murid yang keluar paksa dari aplikasi atau melanggar aturan selama asesmen berlangsung.</p>
         </div>
-        <button id="btnClearLogs" class="bg-red-50 hover:bg-red-100 text-red-700 text-[11px] font-bold px-2.5 py-1 rounded-md border border-red-200 transition">
-          Bersihkan Semua Log
-        </button>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="window.triggerManualRefresh(this)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-md border border-slate-300 transition">
+            ↻ Refresh
+          </button>
+          <button id="btnClearLogs" class="bg-red-50 hover:bg-red-100 text-red-700 text-[11px] font-bold px-2.5 py-1 rounded-md border border-red-200 transition">
+            Bersihkan Semua Log
+          </button>
+        </div>
       </div>
 
       <div class="overflow-x-auto">
@@ -436,8 +469,8 @@
           </div>
 
           <div class="flex flex-col sm:flex-row gap-2 pt-1">
-            <button type="submit" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-md text-xs shadow transition">
-              Simpan / Update Pengaturan Server
+            <button type="submit" id="btnSaveSettings" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 rounded-md text-xs shadow transition flex items-center justify-center gap-1.5">
+              <span>Simpan / Update Pengaturan Server</span>
             </button>
             <button type="button" id="btnDeleteSettings" class="bg-red-50 hover:bg-red-100 text-red-700 font-bold px-3 py-2 rounded-md text-[11px] border border-red-200 transition">
               Hapus / Reset ke Default
@@ -459,8 +492,8 @@
         <form id="adminAddForm" class="flex gap-2 mb-3">
           <input type="text" id="newAdminUid" placeholder="Masukkan UID Firebase Proktor..." required
             class="flex-1 px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md outline-none focus:ring-2 focus:ring-teal-500" />
-          <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-3 py-1.5 rounded-md text-xs shadow transition whitespace-nowrap">
-            + Tambah Proktor
+          <button type="submit" id="btnAddAdmin" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-3 py-1.5 rounded-md text-xs shadow transition whitespace-nowrap flex items-center gap-1">
+            <span>+ Tambah Proktor</span>
           </button>
         </form>
 
@@ -542,8 +575,8 @@
           <button type="button" id="btnCancelUserModal" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-3 py-1.5 rounded-md">
             Batal
           </button>
-          <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md shadow">
-            Simpan Perubahan
+          <button type="submit" id="btnSubmitEditUser" class="bg-teal-700 hover:bg-teal-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md shadow flex items-center gap-1">
+            <span>Simpan Perubahan</span>
           </button>
         </div>
       </form>
@@ -592,8 +625,8 @@
           <button type="button" id="btnCancelLogModal" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold px-3 py-1.5 rounded-md">
             Batal
           </button>
-          <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md shadow">
-            Simpan Perubahan Log
+          <button type="submit" id="btnSubmitEditLog" class="bg-teal-700 hover:bg-teal-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md shadow flex items-center gap-1">
+            <span>Simpan Perubahan Log</span>
           </button>
         </div>
       </form>
@@ -619,7 +652,8 @@
       deleteDoc, 
       onSnapshot, 
       serverTimestamp,
-      getDoc
+      getDoc,
+      getDocs
     } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
     if (window.location.protocol === 'file:') {
@@ -627,7 +661,7 @@
     }
 
     // ====================================================
-    // SISTEM LOADING ANIMASI (UPLOAD & DOWNLOAD) & TOAST
+    // SISTEM LOADING ANIMASI (UPLOAD & DOWNLOAD) & NOTIFIKASI
     // ====================================================
     const topLoadingBar = document.getElementById('topLoadingBar');
     const loadingOverlay = document.getElementById('loadingOverlay');
@@ -638,16 +672,18 @@
     const syncSpinner = document.getElementById('syncSpinner');
     const syncStatusLabel = document.getElementById('syncStatusLabel');
     const toastContainer = document.getElementById('toastContainer');
+    const inlineStatusAlert = document.getElementById('inlineStatusAlert');
+    const inlineStatusIcon = document.getElementById('inlineStatusIcon');
+    const inlineStatusTitle = document.getElementById('inlineStatusTitle');
+    const inlineStatusMessage = document.getElementById('inlineStatusMessage');
 
+    document.getElementById('btnCloseInlineAlert').addEventListener('click', () => {
+      inlineStatusAlert.classList.add('hidden');
+    });
+
+    const sleep = (ms) => new Promise(res => setTimeout(res, ms));
     let loadingCounter = 0;
 
-    /**
-     * Menampilkan animasi loading untuk Upload (menyimpan/menghapus) atau Download (mengambil data)
-     * @param {string} title - Judul proses
-     * @param {string} subtitle - Subjudul detail
-     * @param {'upload'|'download'} mode - Jenis transaksi data
-     * @param {boolean} blocking - Tampilkan modal overlay tengah layar jika true
-     */
     function showLoading(title = 'Memproses Data...', subtitle = 'Mohon tunggu sebentar', mode = 'upload', blocking = true) {
       loadingCounter++;
       topLoadingBar.classList.remove('hidden');
@@ -675,12 +711,58 @@
     }
 
     /**
-     * Menampilkan Notifikasi Toast Sukses / Gagal / Info
-     * @param {string} title - Judul notifikasi
-     * @param {string} message - Isi pesan detail
-     * @param {'success'|'error'|'info'} type - Tipe notifikasi
+     * Pembungkus aksi dengan animasi loading di tombol + modal tengah layar (minimal tampil 500ms agar terlihat jelas)
+     */
+    async function runWithLoading({ title, subtitle, mode = 'upload', buttonEl = null, loadingBtnText = 'Memproses...' }, asyncTask) {
+      let originalBtnHtml = '';
+      if (buttonEl) {
+        originalBtnHtml = buttonEl.innerHTML;
+        buttonEl.disabled = true;
+        buttonEl.innerHTML = `
+          <span class="w-3.5 h-3.5 rounded-full border-2 border-current border-t-transparent animate-spin inline-block"></span>
+          <span>${loadingBtnText}</span>
+        `;
+      }
+      showLoading(title, subtitle, mode, true);
+      const startTime = Date.now();
+      try {
+        return await asyncTask();
+      } finally {
+        const elapsed = Date.now() - startTime;
+        if (elapsed < 500) {
+          await sleep(500 - elapsed);
+        }
+        if (buttonEl) {
+          buttonEl.disabled = false;
+          buttonEl.innerHTML = originalBtnHtml;
+        }
+        hideLoading();
+      }
+    }
+
+    /**
+     * Menampilkan Notifikasi Ganda: Toast Melayang (Kanan Atas) + Status Bar di Dalam Panel
      */
     function showToast(title, message, type = 'success') {
+      // 1. Update Inline Status Bar di dalam halaman panel
+      inlineStatusAlert.classList.remove('hidden');
+      if (type === 'error') {
+        inlineStatusAlert.className = 'rounded-lg px-3.5 py-2.5 border flex items-center justify-between gap-2 shadow-xs bg-red-50 border-red-300 text-red-900';
+        inlineStatusIcon.className = 'w-5 h-5 rounded-full flex items-center justify-center font-extrabold text-xs shrink-0 bg-red-600 text-white';
+        inlineStatusIcon.textContent = '✕';
+      } else if (type === 'info') {
+        inlineStatusAlert.className = 'rounded-lg px-3.5 py-2.5 border flex items-center justify-between gap-2 shadow-xs bg-teal-50 border-teal-300 text-teal-900';
+        inlineStatusIcon.className = 'w-5 h-5 rounded-full flex items-center justify-center font-extrabold text-xs shrink-0 bg-teal-600 text-white';
+        inlineStatusIcon.textContent = '↓';
+      } else {
+        inlineStatusAlert.className = 'rounded-lg px-3.5 py-2.5 border flex items-center justify-between gap-2 shadow-xs bg-emerald-50 border-emerald-300 text-emerald-900';
+        inlineStatusIcon.className = 'w-5 h-5 rounded-full flex items-center justify-center font-extrabold text-xs shrink-0 bg-emerald-600 text-white';
+        inlineStatusIcon.textContent = '✓';
+      }
+      inlineStatusTitle.textContent = title;
+      inlineStatusMessage.textContent = message;
+
+      // 2. Tampilkan Toast Melayang di Kanan Atas
       const toast = document.createElement('div');
       let bgClass = 'bg-emerald-700 border-emerald-500 text-white';
       let iconHtml = '✓';
@@ -714,7 +796,7 @@
       closeBtn.addEventListener('click', removeToast);
       toastContainer.appendChild(toast);
 
-      setTimeout(removeToast, type === 'error' ? 6000 : 3500);
+      setTimeout(removeToast, type === 'error' ? 6500 : 4000);
     }
 
     const firebaseConfig = {
@@ -807,9 +889,9 @@
       });
     });
 
-    // Auth Handlers
+    // Auth Handlers dengan Animasi Loading di Tombol & Modal
     const loginErrorMsg = document.getElementById('loginErrorMsg');
-    async function triggerGoogleLogin() {
+    async function triggerGoogleLogin(btnEl) {
       loginErrorMsg.classList.add('hidden');
       if (window.location.protocol === 'file:') {
         const fileMsg = `Tidak bisa Login dari file lokal (file://). Upload file ini ke GitHub Pages atau jalankan lewat local server.`;
@@ -818,37 +900,48 @@
         showToast('Login Diblokir Protokol Lokal', fileMsg, 'error');
         return;
       }
-      showLoading('Autentikasi Proktor...', 'Membuka jendela login Google', 'upload', true);
-      try {
-        const res = await signInWithPopup(auth, provider);
-        showToast('Login Berhasil', `Selamat datang, ${res.user.email}`, 'success');
-      } catch (err) {
-        let msg = "Gagal login Google: " + (err.message || err);
-        if (err.code === 'auth/unauthorized-domain') {
-          msg = `Domain ${window.location.hostname} belum diizinkan di Firebase Console -> Authentication -> Settings -> Authorized domains.`;
-        } else if (err.code === 'auth/operation-not-supported-in-this-environment') {
-          msg = `Browser tidak mendukung Popup OAuth pada protokol ini. Gunakan https:// (GitHub Pages) atau http://localhost.`;
+
+      await runWithLoading({
+        title: 'Autentikasi Akun Proktor...',
+        subtitle: 'Memverifikasi login Google & mengunduh data server',
+        mode: 'download',
+        buttonEl: btnEl,
+        loadingBtnText: 'Memproses Login...'
+      }, async () => {
+        try {
+          const res = await signInWithPopup(auth, provider);
+          showToast('Login Berhasil', `Selamat datang, ${res.user.email}`, 'success');
+        } catch (err) {
+          let msg = "Gagal login Google: " + (err.message || err);
+          if (err.code === 'auth/unauthorized-domain') {
+            msg = `Domain ${window.location.hostname} belum diizinkan di Firebase Console -> Authentication -> Settings -> Authorized domains.`;
+          } else if (err.code === 'auth/operation-not-supported-in-this-environment') {
+            msg = `Browser tidak mendukung Popup OAuth pada protokol ini. Gunakan https:// (GitHub Pages) atau http://localhost.`;
+          }
+          loginErrorMsg.innerHTML = msg;
+          loginErrorMsg.classList.remove('hidden');
+          showToast('Gagal Login Proktor', msg, 'error');
         }
-        loginErrorMsg.innerHTML = msg;
-        loginErrorMsg.classList.remove('hidden');
-        showToast('Gagal Login Proktor', msg, 'error');
-      } finally {
-        hideLoading();
-      }
+      });
     }
 
-    document.getElementById('btnLoginGoogle').addEventListener('click', triggerGoogleLogin);
-    document.getElementById('btnLoginGate').addEventListener('click', triggerGoogleLogin);
-    document.getElementById('btnLogout').addEventListener('click', async () => {
-      showLoading('Keluar Sesi...', 'Menutup koneksi akun Proktor', 'upload', true);
-      try {
-        await signOut(auth);
-        showToast('Berhasil Keluar', 'Anda telah keluar dari Panel Proktor.', 'info');
-      } catch (err) {
-        showToast('Gagal Keluar', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+    document.getElementById('btnLoginGoogle').addEventListener('click', (e) => triggerGoogleLogin(e.currentTarget));
+    document.getElementById('btnLoginGate').addEventListener('click', (e) => triggerGoogleLogin(e.currentTarget));
+    document.getElementById('btnLogout').addEventListener('click', async (e) => {
+      await runWithLoading({
+        title: 'Keluar Sesi Proktor...',
+        subtitle: 'Menutup sesi autentikasi',
+        mode: 'upload',
+        buttonEl: e.currentTarget,
+        loadingBtnText: 'Keluar...'
+      }, async () => {
+        try {
+          await signOut(auth);
+          showToast('Berhasil Keluar', 'Anda telah keluar dari Panel Proktor.', 'info');
+        } catch (err) {
+          showToast('Gagal Keluar', err.message, 'error');
+        }
+      });
     });
 
     let unsubExams = null;
@@ -859,7 +952,6 @@
     let cachedUsers = [];
     let cachedLogs = new Map();
     let editingExamId = null;
-    let initialDownloadNotified = false;
     let currentRandomSuffix = Math.floor(1000 + Math.random() * 9000);
 
     // Generator Otomatis ID Jadwal Unik
@@ -909,23 +1001,45 @@
       }
     }
 
-    // Tombol Muat Ulang / Download Data Manual
-    document.getElementById('btnRefreshData').addEventListener('click', async () => {
+    // Fungsi Refresh / Unduh Ulang Semua Data dari Server
+    window.triggerManualRefresh = async (btnEl = null) => {
       const refreshIcon = document.getElementById('refreshIcon');
-      refreshIcon.classList.add('animate-spin');
-      showLoading('Mengunduh Data Terbaru...', 'Menyinkronkan jadwal, peserta, dan log dari Firestore', 'download', true);
-      try {
-        startRealtimeListeners(true);
-        await loadGlobalSettings(false);
-        showToast('Sinkronisasi Berhasil', 'Seluruh data berhasil diunduh dari server.', 'success');
-      } catch (err) {
-        showToast('Gagal Mengunduh Data', err.message, 'error');
-      } finally {
-        setTimeout(() => {
-          refreshIcon.classList.remove('animate-spin');
-          hideLoading();
-        }, 400);
-      }
+      if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+      await runWithLoading({
+        title: 'Me-refresh & Mengunduh Data...',
+        subtitle: 'Menyinkronkan Jadwal, Peserta, Log Pelanggaran & Status Server',
+        mode: 'download',
+        buttonEl: btnEl,
+        loadingBtnText: 'Me-refresh...'
+      }, async () => {
+        try {
+          const [examsSnap, usersSnap, logsSnap] = await Promise.all([
+            getDocs(collection(db, 'exams')),
+            getDocs(collection(db, 'users')),
+            getDocs(collection(db, 'cheat_logs'))
+          ]);
+          renderExamsSnapshot(examsSnap);
+          cachedUsers = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+          renderUsersTable();
+          renderLogsSnapshot(logsSnap);
+          await loadGlobalSettings();
+          startRealtimeListeners();
+          showToast(
+            'Refresh Data Berhasil',
+            `Berhasil mengunduh ${examsSnap.size} jadwal, ${usersSnap.size} peserta, dan ${logsSnap.size} log pelanggaran.`,
+            'success'
+          );
+        } catch (err) {
+          showToast('Gagal Mengunduh Data', err.message, 'error');
+        } finally {
+          if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+        }
+      });
+    };
+
+    document.getElementById('btnRefreshData').addEventListener('click', (e) => {
+      window.triggerManualRefresh(e.currentTarget);
     });
 
     onAuthStateChanged(auth, async (user) => {
@@ -944,11 +1058,15 @@
         loginGate.classList.add('hidden');
         adminMain.classList.remove('hidden');
 
-        showLoading('Mengunduh Data Server...', 'Memuat jadwal, peserta, dan pengaturan asesmen', 'download', true);
-        await checkAdminPermissionBanner(user);
-        startRealtimeListeners(false);
-        await loadGlobalSettings(false);
-        hideLoading();
+        await runWithLoading({
+          title: 'Mengunduh Data Server...',
+          subtitle: 'Memuat Jadwal, Peserta, Log Pelanggaran, dan Pengaturan',
+          mode: 'download'
+        }, async () => {
+          await checkAdminPermissionBanner(user);
+          startRealtimeListeners();
+          await loadGlobalSettings();
+        });
       } else {
         authStatusText.textContent = "Belum Login";
         btnLoginGoogle.classList.remove('hidden');
@@ -1018,35 +1136,43 @@
 
     window.deleteExam = async (id) => {
       if (!confirm('Hapus jadwal ujian ' + id + '?')) return;
-      showLoading('Menghapus Jadwal...', `Menghapus jadwal ${id} dari server`, 'upload', true);
-      try {
-        await deleteDoc(doc(db, 'exams', id));
-        if (editingExamId === id) resetExamFormMode();
-        showToast('Berhasil Dihapus', `Jadwal ujian ${id} telah dihapus.`, 'success');
-      } catch (err) {
-        showToast('Gagal Menghapus Jadwal', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Menghapus Jadwal...',
+        subtitle: `Menghapus jadwal ${id} dari Cloud Firestore`,
+        mode: 'upload'
+      }, async () => {
+        try {
+          await deleteDoc(doc(db, 'exams', id));
+          if (editingExamId === id) resetExamFormMode();
+          showToast('Berhasil Dihapus', `Jadwal ujian ${id} telah dihapus.`, 'success');
+        } catch (err) {
+          showToast('Gagal Menghapus Jadwal', err.message, 'error');
+        }
+      });
     };
 
-    document.getElementById('btnDeleteAllExams').addEventListener('click', async () => {
+    document.getElementById('btnDeleteAllExams').addEventListener('click', async (e) => {
       if (cachedExams.size === 0) {
         showToast('Data Kosong', 'Tidak ada jadwal ujian untuk dihapus.', 'info');
         return;
       }
       if (!confirm(`Hapus SEMUA (${cachedExams.size}) jadwal ujian? Tindakan ini tidak dapat dibatalkan.`)) return;
-      showLoading('Menghapus Semua Jadwal...', `Menghapus ${cachedExams.size} dokumen jadwal ujian`, 'upload', true);
-      try {
-        const count = cachedExams.size;
-        await Promise.all(Array.from(cachedExams.keys()).map(id => deleteDoc(doc(db, 'exams', id))));
-        resetExamFormMode();
-        showToast('Berhasil Dihapus', `Seluruh jadwal ujian (${count} jadwal) berhasil dihapus.`, 'success');
-      } catch (err) {
-        showToast('Gagal Menghapus Semua Jadwal', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Menghapus Semua Jadwal...',
+        subtitle: `Menghapus ${cachedExams.size} dokumen jadwal ujian`,
+        mode: 'upload',
+        buttonEl: e.currentTarget,
+        loadingBtnText: 'Menghapus...'
+      }, async () => {
+        try {
+          const count = cachedExams.size;
+          await Promise.all(Array.from(cachedExams.keys()).map(id => deleteDoc(doc(db, 'exams', id))));
+          resetExamFormMode();
+          showToast('Berhasil Dihapus', `Seluruh jadwal ujian (${count} jadwal) berhasil dihapus.`, 'success');
+        } catch (err) {
+          showToast('Gagal Menghapus Semua Jadwal', err.message, 'error');
+        }
+      });
     });
 
     document.getElementById('examForm').addEventListener('submit', async (e) => {
@@ -1074,79 +1200,80 @@
       const isActive = document.getElementById('examIsActive').checked;
 
       const isEditMode = Boolean(editingExamId);
-      btnSubmitExam.disabled = true;
-      showLoading(
-        isEditMode ? 'Mengunggah Perubahan Jadwal...' : 'Mengunggah Jadwal Baru...',
-        `${mapel} (${examDate})`,
-        'upload',
-        true
-      );
 
-      try {
-        if (isEditMode) {
-          await updateDoc(doc(db, 'exams', editingExamId), {
-            mapel,
-            examDate,
-            hariTanggal,
-            mulai,
-            selesai,
-            linkSoal,
-            angkatan,
-            jurusan,
-            isActive,
-            updatedAt: serverTimestamp()
-          });
-          resetExamFormMode();
-          showToast('Jadwal Diperbarui', `Jadwal "${mapel}" berhasil diperbarui di Firestore.`, 'success');
-        } else {
-          await setDoc(doc(db, 'exams', id), {
-            id,
-            mapel,
-            examDate,
-            hariTanggal,
-            mulai,
-            selesai,
-            linkSoal,
-            angkatan,
-            jurusan,
-            isActive,
-            authorId: auth.currentUser.uid,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
-          });
-          resetExamFormMode();
-          showToast('Jadwal Tersimpan', `Jadwal "${mapel}" (${id}) berhasil disimpan ke Firestore.`, 'success');
+      await runWithLoading({
+        title: isEditMode ? 'Mengunggah Perubahan Jadwal...' : 'Menyimpan Jadwal Baru...',
+        subtitle: `${mapel} (${examDate})`,
+        mode: 'upload',
+        buttonEl: btnSubmitExam,
+        loadingBtnText: isEditMode ? 'Mengupdate Jadwal...' : 'Menyimpan Jadwal...'
+      }, async () => {
+        try {
+          if (isEditMode) {
+            await updateDoc(doc(db, 'exams', editingExamId), {
+              mapel,
+              examDate,
+              hariTanggal,
+              mulai,
+              selesai,
+              linkSoal,
+              angkatan,
+              jurusan,
+              isActive,
+              updatedAt: serverTimestamp()
+            });
+            resetExamFormMode();
+            showToast('Jadwal Diperbarui', `Jadwal "${mapel}" berhasil diperbarui di Firestore.`, 'success');
+          } else {
+            await setDoc(doc(db, 'exams', id), {
+              id,
+              mapel,
+              examDate,
+              hariTanggal,
+              mulai,
+              selesai,
+              linkSoal,
+              angkatan,
+              jurusan,
+              isActive,
+              authorId: auth.currentUser.uid,
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp()
+            });
+            resetExamFormMode();
+            showToast('Jadwal Tersimpan', `Jadwal "${mapel}" (${id}) berhasil disimpan ke Firestore.`, 'success');
+          }
+        } catch (err) {
+          showToast(
+            'Gagal Menyimpan Jadwal',
+            `${err.message}. Pastikan akun Anda adalah Admin Proktor.`,
+            'error'
+          );
         }
-      } catch (err) {
-        showToast(
-          'Gagal Menyimpan Jadwal',
-          `${err.message}. Pastikan akun Anda adalah Admin Proktor.`,
-          'error'
-        );
-      } finally {
-        btnSubmitExam.disabled = false;
-        hideLoading();
-      }
+      });
     });
 
     // ====================================================
     // 2. MANAJEMEN PESERTA (RESET, EDIT, HAPUS)
     // ====================================================
     window.resetUserStatus = async (uid, nama = 'Peserta') => {
-      showLoading('Mereset Status Murid...', `Membuka kunci ujian untuk ${nama}`, 'upload', true);
-      try {
-        await updateDoc(doc(db, 'users', uid), {
-          isLoggedIn: false,
-          examStatus: 'idle',
-          statusMengerjakan: '0',
-          updatedAt: serverTimestamp()
-        });
-        showToast('Reset Berhasil', `Status pengerjaan "${nama}" berhasil dibuka kembali.`, 'success');
-      } catch (err) {
-        showToast('Gagal Mereset Peserta', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Mereset Status Murid...',
+        subtitle: `Membuka kunci ujian untuk ${nama}`,
+        mode: 'upload'
+      }, async () => {
+        try {
+          await updateDoc(doc(db, 'users', uid), {
+            isLoggedIn: false,
+            examStatus: 'idle',
+            statusMengerjakan: '0',
+            updatedAt: serverTimestamp()
+          });
+          showToast('Reset Berhasil', `Status pengerjaan "${nama}" berhasil dibuka kembali.`, 'success');
+        } catch (err) {
+          showToast('Gagal Mereset Peserta', err.message, 'error');
+        }
+      });
     };
 
     window.openEditUserModal = (uid) => {
@@ -1182,62 +1309,75 @@
       const examStatus = examStatusMap[statusMengerjakan] || 'idle';
       const isLoggedIn = statusMengerjakan === '1';
 
-      showLoading('Menyimpan Data Murid...', `Memperbarui profil ${nama}`, 'upload', true);
-      try {
-        await updateDoc(doc(db, 'users', uid), {
-          username,
-          nama,
-          angkatan,
-          jurusan,
-          kelas,
-          statusMengerjakan,
-          examStatus,
-          isLoggedIn,
-          updatedAt: serverTimestamp()
-        });
-        closeEditUserModal();
-        showToast('Data Murid Diperbarui', `Profil "${nama}" (${kelas}) berhasil disimpan.`, 'success');
-      } catch (err) {
-        showToast('Gagal Mengupdate Murid', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Menyimpan Data Murid...',
+        subtitle: `Memperbarui profil ${nama}`,
+        mode: 'upload',
+        buttonEl: document.getElementById('btnSubmitEditUser'),
+        loadingBtnText: 'Menyimpan...'
+      }, async () => {
+        try {
+          await updateDoc(doc(db, 'users', uid), {
+            username,
+            nama,
+            angkatan,
+            jurusan,
+            kelas,
+            statusMengerjakan,
+            examStatus,
+            isLoggedIn,
+            updatedAt: serverTimestamp()
+          });
+          closeEditUserModal();
+          showToast('Data Murid Diperbarui', `Profil "${nama}" (${kelas}) berhasil disimpan.`, 'success');
+        } catch (err) {
+          showToast('Gagal Mengupdate Murid', err.message, 'error');
+        }
+      });
     });
 
     window.deleteUserDoc = async (uid, nama) => {
       if (!confirm(`Hapus data profil peserta "${nama}" dari Firestore?`)) return;
-      showLoading('Menghapus Peserta...', `Menghapus profil ${nama} dari database`, 'upload', true);
-      try {
-        await deleteDoc(doc(db, 'users', uid));
-        showToast('Peserta Dihapus', `Data peserta "${nama}" berhasil dihapus.`, 'success');
-      } catch (err) {
-        showToast('Gagal Menghapus Peserta', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Menghapus Peserta...',
+        subtitle: `Menghapus profil ${nama} dari database`,
+        mode: 'upload'
+      }, async () => {
+        try {
+          await deleteDoc(doc(db, 'users', uid));
+          showToast('Peserta Dihapus', `Data peserta "${nama}" berhasil dihapus.`, 'success');
+        } catch (err) {
+          showToast('Gagal Menghapus Peserta', err.message, 'error');
+        }
+      });
     };
 
-    document.getElementById('btnResetAllLocked').addEventListener('click', async () => {
+    document.getElementById('btnResetAllLocked').addEventListener('click', async (e) => {
       const locked = cachedUsers.filter(u => String(u.statusMengerjakan) === '1' || u.examStatus === 'mengerjakan' || u.examStatus === 'terkunci');
       if (locked.length === 0) {
         showToast('Tidak Ada Murid Terkunci', 'Saat ini tidak ada murid yang berstatus terkunci/mengerjakan.', 'info');
         return;
       }
       if (!confirm(`Reset status ${locked.length} murid yang sedang terkunci/mengerjakan agar bisa login ulang?`)) return;
-      showLoading('Mereset Massal...', `Membuka kunci ${locked.length} murid secara serentak`, 'upload', true);
-      try {
-        await Promise.all(locked.map(u => updateDoc(doc(db, 'users', u.id), {
-          isLoggedIn: false,
-          examStatus: 'idle',
-          statusMengerjakan: '0',
-          updatedAt: serverTimestamp()
-        })));
-        showToast('Reset Massal Berhasil', `${locked.length} murid telah direset menjadi siap login (Idle).`, 'success');
-      } catch (err) {
-        showToast('Gagal Mereset Massal', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Mereset Massal...',
+        subtitle: `Membuka kunci ${locked.length} murid secara serentak`,
+        mode: 'upload',
+        buttonEl: e.currentTarget,
+        loadingBtnText: 'Mereset...'
+      }, async () => {
+        try {
+          await Promise.all(locked.map(u => updateDoc(doc(db, 'users', u.id), {
+            isLoggedIn: false,
+            examStatus: 'idle',
+            statusMengerjakan: '0',
+            updatedAt: serverTimestamp()
+          })));
+          showToast('Reset Massal Berhasil', `${locked.length} murid telah direset menjadi siap login (Idle).`, 'success');
+        } catch (err) {
+          showToast('Gagal Mereset Massal', err.message, 'error');
+        }
+      });
     });
 
     document.getElementById('searchUserInput').addEventListener('input', renderUsersTable);
@@ -1334,108 +1474,149 @@
       const mapel = document.getElementById('editLogMapel').value.trim();
       const deskripsi = document.getElementById('editLogDeskripsi').value.trim();
 
-      showLoading('Menyimpan Perubahan Log...', `Memperbarui log pelanggaran ${nama}`, 'upload', true);
-      try {
-        await updateDoc(doc(db, 'cheat_logs', logId), {
-          username,
-          nama,
-          kelas,
-          mapel,
-          deskripsi
-        });
-        closeEditLogModal();
-        showToast('Log Diperbarui', `Catatan pelanggaran "${nama}" berhasil disimpan.`, 'success');
-      } catch (err) {
-        showToast('Gagal Mengupdate Log', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Menyimpan Perubahan Log...',
+        subtitle: `Memperbarui log pelanggaran ${nama}`,
+        mode: 'upload',
+        buttonEl: document.getElementById('btnSubmitEditLog'),
+        loadingBtnText: 'Menyimpan...'
+      }, async () => {
+        try {
+          await updateDoc(doc(db, 'cheat_logs', logId), {
+            username,
+            nama,
+            kelas,
+            mapel,
+            deskripsi
+          });
+          closeEditLogModal();
+          showToast('Log Diperbarui', `Catatan pelanggaran "${nama}" berhasil disimpan.`, 'success');
+        } catch (err) {
+          showToast('Gagal Mengupdate Log', err.message, 'error');
+        }
+      });
     });
 
     window.deleteCheatLog = async (logId) => {
       if (!confirm('Hapus catatan pelanggaran ini?')) return;
-      showLoading('Menghapus Log...', 'Menghapus catatan pelanggaran dari server', 'upload', true);
-      try {
-        await deleteDoc(doc(db, 'cheat_logs', logId));
-        showToast('Log Dihapus', 'Catatan pelanggaran berhasil dihapus.', 'success');
-      } catch (err) {
-        showToast('Gagal Menghapus Log', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Menghapus Log...',
+        subtitle: 'Menghapus catatan pelanggaran dari server',
+        mode: 'upload'
+      }, async () => {
+        try {
+          await deleteDoc(doc(db, 'cheat_logs', logId));
+          showToast('Log Dihapus', 'Catatan pelanggaran berhasil dihapus.', 'success');
+        } catch (err) {
+          showToast('Gagal Menghapus Log', err.message, 'error');
+        }
+      });
     };
 
     // ====================================================
-    // 4. REALTIME LISTENERS (EXAMS, USERS, CHEAT_LOGS, ADMINS)
+    // 4. RENDER & REALTIME LISTENERS (EXAMS, USERS, CHEAT_LOGS, ADMINS)
     // ====================================================
-    function startRealtimeListeners(isManualRefresh = false) {
+    function renderExamsSnapshot(snap) {
+      const todayStr = getTodayFormatted();
+      const tbody = document.getElementById('examsTableBody');
+      document.getElementById('examCountBadge').textContent = `${snap.size} Jadwal`;
+      cachedExams.clear();
+
+      if (snap.empty) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada jadwal ujian di Firestore.</td></tr>`;
+        return;
+      }
+
+      const items = snap.docs.map(d => {
+        const data = { id: d.id, ...d.data() };
+        cachedExams.set(d.id, data);
+        return data;
+      });
+
+      tbody.innerHTML = items.map(ex => {
+        const isToday = ex.examDate === todayStr;
+        const dateBadge = isToday
+          ? `<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold border border-emerald-300 text-[10px]">${ex.examDate} (HARI INI)</span>`
+          : `<span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[10px]">${ex.examDate}</span>`;
+        const activeBadge = ex.isActive === false
+          ? `<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-bold">Nonaktif</span>`
+          : '';
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2 px-2.5">
+              <div class="font-bold text-slate-900">${ex.mapel} ${activeBadge}</div>
+              <div class="text-[10px] font-mono text-slate-400">${ex.id}</div>
+            </td>
+            <td class="py-2 px-2.5">
+              <div>${dateBadge}</div>
+              <div class="text-[10px] text-slate-500 mt-0.5">${ex.hariTanggal || ''}</div>
+            </td>
+            <td class="py-2 px-2.5 font-mono font-semibold text-slate-700">${ex.mulai} - ${ex.selesai}</td>
+            <td class="py-2 px-2.5">
+              <span class="px-1.5 py-0.5 bg-slate-100 rounded font-bold text-slate-700 text-[10px]">${ex.angkatan || 'SEMUA'} &bull; ${ex.jurusan || 'SEMUA'}</span>
+            </td>
+            <td class="py-2 px-2.5 text-right space-x-1 whitespace-nowrap">
+              <button onclick="window.editExam('${ex.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-200 transition">
+                Edit
+              </button>
+              <button onclick="window.deleteExam('${ex.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded border border-red-200 transition">
+                Hapus
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderLogsSnapshot(snap) {
+      const tbody = document.getElementById('logsTableBody');
+      cachedLogs.clear();
+
+      if (snap.empty) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada pelanggaran tercatat.</td></tr>`;
+        return;
+      }
+
+      const logs = snap.docs.map(d => {
+        const item = { id: d.id, ...d.data() };
+        cachedLogs.set(d.id, item);
+        return item;
+      });
+      logs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+      tbody.innerHTML = logs.map(l => {
+        const t = l.createdAt?.toDate ? l.createdAt.toDate().toLocaleString('id-ID') : '-';
+        return `
+          <tr class="hover:bg-red-50/40">
+            <td class="py-2 px-2.5 text-slate-500 whitespace-nowrap text-[10px]">${t}</td>
+            <td class="py-2 px-2.5 font-mono font-bold text-slate-800">${l.username || '-'}</td>
+            <td class="py-2 px-2.5 font-semibold text-slate-900">${l.nama || '-'} <span class="text-slate-400">(${l.kelas || '-'})</span></td>
+            <td class="py-2 px-2.5 font-bold text-red-700">${l.mapel || '-'}</td>
+            <td class="py-2 px-2.5 text-red-600 font-medium">${l.deskripsi || '-'}</td>
+            <td class="py-2 px-2.5 text-right space-x-1 whitespace-nowrap">
+              <button onclick="window.openEditLogModal('${l.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-200 transition">
+                Edit
+              </button>
+              <button onclick="window.deleteCheatLog('${l.id}')" class="bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded border border-red-200 transition">
+                Hapus
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function startRealtimeListeners() {
       if (unsubExams) unsubExams();
       if (unsubUsers) unsubUsers();
       if (unsubLogs) unsubLogs();
       if (unsubAdmins) unsubAdmins();
 
-      const todayStr = getTodayFormatted();
-      showLoading('Mengunduh Data Realtime...', 'Menyinkronkan koleksi Firestore', 'download', false);
-
       // A. Listener Jadwal Ujian
       unsubExams = onSnapshot(collection(db, 'exams'), (snap) => {
-        const tbody = document.getElementById('examsTableBody');
-        document.getElementById('examCountBadge').textContent = `${snap.size} Jadwal`;
-        cachedExams.clear();
-        hideLoading();
-
-        if (!initialDownloadNotified && !isManualRefresh) {
-          initialDownloadNotified = true;
-          showToast('Data Berhasil Diunduh', `Terhubung ke server (${snap.size} jadwal aktif dimuat).`, 'info');
-        }
-
-        if (snap.empty) {
-          tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Belum ada jadwal ujian di Firestore.</td></tr>`;
-          return;
-        }
-
-        const items = snap.docs.map(d => {
-          const data = { id: d.id, ...d.data() };
-          cachedExams.set(d.id, data);
-          return data;
-        });
-
-        tbody.innerHTML = items.map(ex => {
-          const isToday = ex.examDate === todayStr;
-          const dateBadge = isToday
-            ? `<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold border border-emerald-300 text-[10px]">${ex.examDate} (HARI INI)</span>`
-            : `<span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[10px]">${ex.examDate}</span>`;
-          const activeBadge = ex.isActive === false
-            ? `<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-bold">Nonaktif</span>`
-            : '';
-
-          return `
-            <tr class="hover:bg-slate-50">
-              <td class="py-2 px-2.5">
-                <div class="font-bold text-slate-900">${ex.mapel} ${activeBadge}</div>
-                <div class="text-[10px] font-mono text-slate-400">${ex.id}</div>
-              </td>
-              <td class="py-2 px-2.5">
-                <div>${dateBadge}</div>
-                <div class="text-[10px] text-slate-500 mt-0.5">${ex.hariTanggal || ''}</div>
-              </td>
-              <td class="py-2 px-2.5 font-mono font-semibold text-slate-700">${ex.mulai} - ${ex.selesai}</td>
-              <td class="py-2 px-2.5">
-                <span class="px-1.5 py-0.5 bg-slate-100 rounded font-bold text-slate-700 text-[10px]">${ex.angkatan || 'SEMUA'} &bull; ${ex.jurusan || 'SEMUA'}</span>
-              </td>
-              <td class="py-2 px-2.5 text-right space-x-1 whitespace-nowrap">
-                <button onclick="window.editExam('${ex.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-200 transition">
-                  Edit
-                </button>
-                <button onclick="window.deleteExam('${ex.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded border border-red-200 transition">
-                  Hapus
-                </button>
-              </td>
-            </tr>
-          `;
-        }).join('');
+        renderExamsSnapshot(snap);
       }, (err) => {
-        hideLoading();
         showToast('Gagal Mengunduh Jadwal', err.message, 'error');
       });
 
@@ -1449,41 +1630,7 @@
 
       // C. Listener Log Pelanggaran (cheat_logs)
       unsubLogs = onSnapshot(collection(db, 'cheat_logs'), (snap) => {
-        const tbody = document.getElementById('logsTableBody');
-        cachedLogs.clear();
-
-        if (snap.empty) {
-          tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">Belum ada pelanggaran tercatat.</td></tr>`;
-          return;
-        }
-
-        const logs = snap.docs.map(d => {
-          const item = { id: d.id, ...d.data() };
-          cachedLogs.set(d.id, item);
-          return item;
-        });
-        logs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
-        tbody.innerHTML = logs.map(l => {
-          const t = l.createdAt?.toDate ? l.createdAt.toDate().toLocaleString('id-ID') : '-';
-          return `
-            <tr class="hover:bg-red-50/40">
-              <td class="py-2 px-2.5 text-slate-500 whitespace-nowrap text-[10px]">${t}</td>
-              <td class="py-2 px-2.5 font-mono font-bold text-slate-800">${l.username || '-'}</td>
-              <td class="py-2 px-2.5 font-semibold text-slate-900">${l.nama || '-'} <span class="text-slate-400">(${l.kelas || '-'})</span></td>
-              <td class="py-2 px-2.5 font-bold text-red-700">${l.mapel || '-'}</td>
-              <td class="py-2 px-2.5 text-red-600 font-medium">${l.deskripsi || '-'}</td>
-              <td class="py-2 px-2.5 text-right space-x-1 whitespace-nowrap">
-                <button onclick="window.openEditLogModal('${l.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-200 transition">
-                  Edit
-                </button>
-                <button onclick="window.deleteCheatLog('${l.id}')" class="bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded border border-red-200 transition">
-                  Hapus
-                </button>
-              </td>
-            </tr>
-          `;
-        }).join('');
+        renderLogsSnapshot(snap);
       }, (err) => {
         showToast('Gagal Mengunduh Log Pelanggaran', err.message, 'error');
       });
@@ -1511,22 +1658,27 @@
         }).join('');
       }, () => {});
 
-      document.getElementById('btnClearLogs').onclick = async () => {
+      document.getElementById('btnClearLogs').onclick = async (e) => {
         if (cachedLogs.size === 0) {
           showToast('Log Kosong', 'Tidak ada catatan log pelanggaran untuk dibersihkan.', 'info');
           return;
         }
         if (!confirm("Hapus semua catatan log pelanggaran?")) return;
-        showLoading('Membersihkan Semua Log...', `Menghapus ${cachedLogs.size} catatan pelanggaran`, 'upload', true);
-        try {
-          const total = cachedLogs.size;
-          await Promise.all(Array.from(cachedLogs.keys()).map(id => deleteDoc(doc(db, 'cheat_logs', id))));
-          showToast('Log Dibersihkan', `${total} catatan pelanggaran berhasil dihapus.`, 'success');
-        } catch (err) {
-          showToast('Gagal Membersihkan Log', err.message, 'error');
-        } finally {
-          hideLoading();
-        }
+        await runWithLoading({
+          title: 'Membersihkan Semua Log...',
+          subtitle: `Menghapus ${cachedLogs.size} catatan pelanggaran`,
+          mode: 'upload',
+          buttonEl: e.currentTarget,
+          loadingBtnText: 'Membersihkan...'
+        }, async () => {
+          try {
+            const total = cachedLogs.size;
+            await Promise.all(Array.from(cachedLogs.keys()).map(id => deleteDoc(doc(db, 'cheat_logs', id))));
+            showToast('Log Dibersihkan', `${total} catatan pelanggaran berhasil dihapus.`, 'success');
+          } catch (err) {
+            showToast('Gagal Membersihkan Log', err.message, 'error');
+          }
+        });
       };
     }
 
@@ -1537,39 +1689,44 @@
       e.preventDefault();
       const targetUid = document.getElementById('newAdminUid').value.trim();
       if (!targetUid) return;
-      showLoading('Menambahkan Proktor...', `Mendaftarkan UID ${targetUid}`, 'upload', true);
-      try {
-        await setDoc(doc(db, 'admins', targetUid), {
-          uid: targetUid,
-          role: 'proktor',
-          createdAt: serverTimestamp()
-        });
-        document.getElementById('newAdminUid').value = '';
-        showToast('Proktor Ditambahkan', `UID ${targetUid} berhasil diberi akses proktor.`, 'success');
-      } catch (err) {
-        showToast('Gagal Menambah Proktor', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Menambahkan Proktor...',
+        subtitle: `Mendaftarkan UID ${targetUid}`,
+        mode: 'upload',
+        buttonEl: document.getElementById('btnAddAdmin'),
+        loadingBtnText: 'Menambah...'
+      }, async () => {
+        try {
+          await setDoc(doc(db, 'admins', targetUid), {
+            uid: targetUid,
+            role: 'proktor',
+            createdAt: serverTimestamp()
+          });
+          document.getElementById('newAdminUid').value = '';
+          showToast('Proktor Ditambahkan', `UID ${targetUid} berhasil diberi akses proktor.`, 'success');
+        } catch (err) {
+          showToast('Gagal Menambah Proktor', err.message, 'error');
+        }
+      });
     });
 
     window.deleteAdminUid = async (uid) => {
       if (!confirm('Hapus akses proktor untuk UID ' + uid + '?')) return;
-      showLoading('Menghapus Akses Proktor...', `Mencabut akses UID ${uid}`, 'upload', true);
-      try {
-        await deleteDoc(doc(db, 'admins', uid));
-        showToast('Akses Proktor Dicabut', `UID ${uid} telah dihapus dari daftar proktor.`, 'success');
-      } catch (err) {
-        showToast('Gagal Menghapus Proktor', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Menghapus Akses Proktor...',
+        subtitle: `Mencabut akses UID ${uid}`,
+        mode: 'upload'
+      }, async () => {
+        try {
+          await deleteDoc(doc(db, 'admins', uid));
+          showToast('Akses Proktor Dicabut', `UID ${uid} telah dihapus dari daftar proktor.`, 'success');
+        } catch (err) {
+          showToast('Gagal Menghapus Proktor', err.message, 'error');
+        }
+      });
     };
 
-    async function loadGlobalSettings(showFeedback = false) {
-      if (showFeedback) {
-        showLoading('Mengunduh Pengaturan Server...', 'Membaca konfigurasi settings/global', 'download', false);
-      }
+    async function loadGlobalSettings() {
       try {
         const snap = await getDoc(doc(db, 'settings', 'global'));
         if (snap.exists()) {
@@ -1586,47 +1743,55 @@
         }
       } catch (e) {
         showToast('Gagal Memuat Pengaturan', e.message || 'Gagal membaca konfigurasi server.', 'error');
-      } finally {
-        if (showFeedback) hideLoading();
       }
     }
 
     document.getElementById('settingsForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      showLoading('Menyimpan Pengaturan Server...', 'Mengunggah perubahan ke settings/global', 'upload', true);
-      try {
-        const isOpen = document.getElementById('settingStatusUjian').checked;
-        await setDoc(doc(db, 'settings', 'global'), {
-          statusUjian: isOpen,
-          eventName: document.getElementById('settingEventName').value.trim(),
-          eventClass: document.getElementById('settingEventClass').value.trim(),
-          eventYear: document.getElementById('settingEventYear').value.trim(),
-          updatedAt: serverTimestamp()
-        });
-        showToast(
-          'Pengaturan Server Tersimpan',
-          `Status Server Ujian: ${isOpen ? 'AKTIF (Dibuka)' : 'NONAKTIF (Ditutup)'}.`,
-          'success'
-        );
-      } catch (err) {
-        showToast('Gagal Menyimpan Pengaturan', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Menyimpan Pengaturan Server...',
+        subtitle: 'Mengunggah perubahan ke settings/global',
+        mode: 'upload',
+        buttonEl: document.getElementById('btnSaveSettings'),
+        loadingBtnText: 'Menyimpan...'
+      }, async () => {
+        try {
+          const isOpen = document.getElementById('settingStatusUjian').checked;
+          await setDoc(doc(db, 'settings', 'global'), {
+            statusUjian: isOpen,
+            eventName: document.getElementById('settingEventName').value.trim(),
+            eventClass: document.getElementById('settingEventClass').value.trim(),
+            eventYear: document.getElementById('settingEventYear').value.trim(),
+            updatedAt: serverTimestamp()
+          });
+          showToast(
+            'Pengaturan Server Tersimpan',
+            `Status Server Ujian: ${isOpen ? 'AKTIF (Dibuka)' : 'NONAKTIF (Ditutup)'}.`,
+            'success'
+          );
+        } catch (err) {
+          showToast('Gagal Menyimpan Pengaturan', err.message, 'error');
+        }
+      });
     });
 
-    document.getElementById('btnDeleteSettings').addEventListener('click', async () => {
+    document.getElementById('btnDeleteSettings').addEventListener('click', async (e) => {
       if (!confirm("Reset/Hapus dokumen pengaturan server ke nilai default?")) return;
-      showLoading('Mereset Pengaturan Server...', 'Mengembalikan pengaturan server ke nilai awal', 'upload', true);
-      try {
-        await deleteDoc(doc(db, 'settings', 'global'));
-        await loadGlobalSettings(false);
-        showToast('Reset Pengaturan Berhasil', 'Pengaturan server berhasil dikembalikan ke nilai default.', 'success');
-      } catch (err) {
-        showToast('Gagal Mereset Pengaturan', err.message, 'error');
-      } finally {
-        hideLoading();
-      }
+      await runWithLoading({
+        title: 'Mereset Pengaturan Server...',
+        subtitle: 'Mengembalikan pengaturan server ke nilai awal',
+        mode: 'upload',
+        buttonEl: e.currentTarget,
+        loadingBtnText: 'Mereset...'
+      }, async () => {
+        try {
+          await deleteDoc(doc(db, 'settings', 'global'));
+          await loadGlobalSettings();
+          showToast('Reset Pengaturan Berhasil', 'Pengaturan server berhasil dikembalikan ke nilai default.', 'success');
+        } catch (err) {
+          showToast('Gagal Mereset Pengaturan', err.message, 'error');
+        }
+      });
     });
   </script>
 </body>
