@@ -93,6 +93,9 @@
 
       <!-- Auth Status & Action -->
       <div id="authSection" class="flex items-center flex-wrap gap-2">
+        <button id="btnHeaderBackup" onclick="window.openBackupMenu()" class="hidden px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-lg text-[11px] shadow-sm transition flex items-center justify-center text-center gap-1.5" title="Backup & Restore Seluruh Data Firebase">
+          <span>💾 Backup &amp; Restore</span>
+        </button>
         <button id="btnRefreshAll" onclick="window.refreshAllData()" class="hidden px-3 py-1.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold rounded-lg text-[11px] shadow-sm transition flex items-center justify-center text-center gap-1.5" title="Muat Ulang Semua Data dari Server">
           <svg id="refreshAllIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
           <span>Refresh Data</span>
@@ -184,13 +187,13 @@
       <!-- STEP 2: 6 TOMBOL MENU UTAMA & PANEL KONTEN -->
       <div id="angkatanWorkspace" class="hidden space-y-4">
 
-        <!-- 6 MENU NAVIGATION BUTTONS (LABEL TENGAH & BERWARNA MODERN) -->
+        <!-- 7 MENU NAVIGATION BUTTONS (LABEL TENGAH & BERWARNA MODERN) -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3">
           <div class="flex items-center justify-between mb-2 px-1">
             <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Langkah 2 &bull; Menu Manajemen <span id="menuHeaderAngkatanLabel" class="text-teal-700">Kelas X</span></span>
             <span class="text-[10px] text-slate-400">Pilih menu di bawah ini</span>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
             <button type="button" id="tabBtn-jadwal" onclick="window.switchMenuTab('jadwal')" class="tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-md bg-gradient-to-br from-teal-600 to-emerald-600 text-white border border-teal-500 ring-2 ring-teal-300">
               <span class="text-[13px] font-extrabold leading-tight text-center">Jadwal Ujian</span>
             </button>
@@ -208,6 +211,9 @@
             </button>
             <button type="button" id="tabBtn-pelanggaran" onclick="window.switchMenuTab('pelanggaran')" class="tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-rose-50 to-red-100 text-rose-900 border border-rose-200 hover:from-rose-100 hover:to-red-200">
               <span class="text-[13px] font-extrabold leading-tight text-center">Log Pelanggaran</span>
+            </button>
+            <button type="button" id="tabBtn-backup" onclick="window.switchMenuTab('backup')" class="tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-emerald-50 to-green-100 text-emerald-900 border border-emerald-200 hover:from-emerald-100 hover:to-green-200">
+              <span class="text-[13px] font-extrabold leading-tight text-center">Backup &amp; Restore</span>
             </button>
           </div>
         </div>
@@ -656,6 +662,197 @@
           </div>
         </section>
 
+        <!-- ========================================== -->
+        <!-- MENU 7: BACKUP & RESTORE DATA FIREBASE (.JSON) -->
+        <!-- ========================================== -->
+        <section id="tab-backup" class="hidden space-y-4">
+          <!-- Info Keamanan Data Firebase Spark -->
+          <div class="bg-gradient-to-r from-teal-900 via-slate-900 to-emerald-950 text-white rounded-xl p-4 shadow-md border border-teal-700/50">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-extrabold text-[10px] uppercase">Info Keamanan Data Spark</span>
+                  <h3 class="text-sm font-extrabold text-white">Apakah Data Terhapus Jika Kuota Spark Overload? TIDAK!</h3>
+                </div>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                  Pada paket gratis <strong>Firebase Spark</strong> (50.000 baca &amp; 20.000 tulis/hari), apabila kuota harian penuh saat ujian berlangsung, <strong>sistem Google Firebase TIDAK AKAN PERNAH menghapus data Anda</strong>. Database hanya menghentikan sementara transaksi baru sampai kuota di-reset otomatis keesokan harinya. Fitur <strong>Backup &amp; Restore (.JSON)</strong> di bawah ini disediakan agar Proktor memiliki salinan cadangan lokal di laptop/HP yang dapat dipulihkan kapan saja.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- KARTU 1: BACKUP DATA (DOWNLOAD .JSON) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-4">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-sm font-bold text-slate-900">📥 Backup Data ke Komputer / HP (.JSON)</h3>
+                      <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">Unduh Cadangan</span>
+                    </div>
+                    <p class="text-[10px] text-slate-500 mt-0.5">
+                      Simpan seluruh data jadwal, akun &amp; password peserta, pengaturan status ujian, admin, serta log pelanggaran ke dalam satu file <code>.json</code>.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Ringkasan Jumlah Data Saat Ini -->
+                <div class="bg-slate-50 rounded-xl border border-slate-200 p-3 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Ringkasan Data Tersimpan di Server Saat Ini</span>
+                    <span id="backupActiveClassLabel" class="text-[10px] font-bold text-teal-700">Kelas X</span>
+                  </div>
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                    <div class="bg-white p-2 rounded-lg border border-slate-200">
+                      <p class="text-[10px] text-slate-500 font-semibold">Jadwal Ujian</p>
+                      <p id="statBackupSchedules" class="text-sm font-extrabold text-indigo-700 mt-0.5">0</p>
+                    </div>
+                    <div class="bg-white p-2 rounded-lg border border-slate-200">
+                      <p class="text-[10px] text-slate-500 font-semibold">Akun Peserta</p>
+                      <p id="statBackupUsers" class="text-sm font-extrabold text-teal-700 mt-0.5">0</p>
+                    </div>
+                    <div class="bg-white p-2 rounded-lg border border-slate-200">
+                      <p class="text-[10px] text-slate-500 font-semibold">Status &amp; Admin</p>
+                      <p id="statBackupSettings" class="text-sm font-extrabold text-purple-700 mt-0.5">4 Dok</p>
+                    </div>
+                    <div class="bg-white p-2 rounded-lg border border-slate-200">
+                      <p class="text-[10px] text-slate-500 font-semibold">Log Pelanggaran</p>
+                      <p id="statBackupLogs" class="text-sm font-extrabold text-rose-700 mt-0.5">0</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pilihan Koleksi yang Akan Di-backup -->
+                <div class="space-y-2">
+                  <label class="block text-[10px] font-bold text-slate-700 uppercase">Pilih Data yang Ingin Disertakan dalam Backup:</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-teal-50/50 transition">
+                      <input type="checkbox" id="chkBackupExams" checked class="rounded text-teal-600 focus:ring-teal-500" />
+                      <span class="text-[11px] font-semibold text-slate-800">Jadwal Ujian (<code>exams</code>)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-teal-50/50 transition">
+                      <input type="checkbox" id="chkBackupUsers" checked class="rounded text-teal-600 focus:ring-teal-500" />
+                      <span class="text-[11px] font-semibold text-slate-800">Akun &amp; Status Peserta (<code>users</code>)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-teal-50/50 transition">
+                      <input type="checkbox" id="chkBackupSettings" checked class="rounded text-teal-600 focus:ring-teal-500" />
+                      <span class="text-[11px] font-semibold text-slate-800">Event &amp; Status Ujian (<code>settings</code>)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-teal-50/50 transition">
+                      <input type="checkbox" id="chkBackupAdmins" checked class="rounded text-teal-600 focus:ring-teal-500" />
+                      <span class="text-[11px] font-semibold text-slate-800">Daftar Admin Proktor (<code>admins</code>)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-teal-50/50 transition sm:col-span-2">
+                      <input type="checkbox" id="chkBackupLogs" checked class="rounded text-teal-600 focus:ring-teal-500" />
+                      <span class="text-[11px] font-semibold text-slate-800">Riwayat Log Pelanggaran (<code>cheat_logs</code>)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
+                <button type="button" onclick="window.downloadBackupData('ALL')" class="flex-1 py-2.5 px-4 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold rounded-lg shadow-md transition text-xs flex items-center justify-center text-center gap-1.5">
+                  <span>📥 Backup Semua Kelas (X, XI, XII)</span>
+                </button>
+                <button type="button" onclick="window.downloadBackupData('CURRENT_CLASS')" class="py-2.5 px-3.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold rounded-lg shadow-sm transition text-[11px] flex items-center justify-center text-center gap-1">
+                  <span>📥 Backup Khusus <span id="btnBackupCurrentClassText">Kelas X</span></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- KARTU 2: RESTORE DATA (UPLOAD FILE .JSON) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-4">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-sm font-bold text-slate-900">📤 Restore / Pulihkan Data dari File (.JSON)</h3>
+                      <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-extrabold text-[10px]">Pulihkan Cadangan</span>
+                    </div>
+                    <p class="text-[10px] text-slate-500 mt-0.5">
+                      Pilih file <code>.json</code> hasil backup untuk memulihkan jadwal ujian, akun peserta, pengaturan event, admin, atau log pelanggaran kembali ke Firebase.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Input File JSON Backup -->
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">1. Pilih File Backup (.JSON)</label>
+                  <input type="file" id="restoreFileInput" accept=".json,application/json" onchange="window.handleRestoreFileChange(event)" class="w-full px-3 py-2 border border-dashed border-slate-300 rounded-xl text-[11px] bg-slate-50 hover:bg-slate-100 cursor-pointer focus:outline-none" />
+                </div>
+
+                <!-- Kotak Pratinjau Isi File Backup -->
+                <div id="restorePreviewBox" class="hidden bg-indigo-50/70 rounded-xl border border-indigo-200 p-3 space-y-2">
+                  <div class="flex items-center justify-between border-b border-indigo-200/70 pb-1.5">
+                    <span class="text-[10px] font-extrabold uppercase text-indigo-900">📄 Pratinjau Isi File Backup</span>
+                    <span id="restorePreviewDate" class="text-[10px] font-semibold text-indigo-700">-</span>
+                  </div>
+                  <div class="grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-center">
+                    <div class="bg-white p-1.5 rounded-lg border border-indigo-100">
+                      <p class="text-[9px] text-slate-500">Jadwal</p>
+                      <p id="previewCountExams" class="text-xs font-extrabold text-indigo-700">0</p>
+                    </div>
+                    <div class="bg-white p-1.5 rounded-lg border border-indigo-100">
+                      <p class="text-[9px] text-slate-500">Peserta</p>
+                      <p id="previewCountUsers" class="text-xs font-extrabold text-teal-700">0</p>
+                    </div>
+                    <div class="bg-white p-1.5 rounded-lg border border-indigo-100">
+                      <p class="text-[9px] text-slate-500">Status</p>
+                      <p id="previewCountSettings" class="text-xs font-extrabold text-purple-700">0</p>
+                    </div>
+                    <div class="bg-white p-1.5 rounded-lg border border-indigo-100">
+                      <p class="text-[9px] text-slate-500">Admin</p>
+                      <p id="previewCountAdmins" class="text-xs font-extrabold text-sky-700">0</p>
+                    </div>
+                    <div class="bg-white p-1.5 rounded-lg border border-indigo-100 col-span-2 sm:col-span-1">
+                      <p class="text-[9px] text-slate-500">Log</p>
+                      <p id="previewCountLogs" class="text-xs font-extrabold text-rose-700">0</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pilihan Koleksi yang Akan Di-restore -->
+                <div class="space-y-2">
+                  <label class="block text-[10px] font-bold text-slate-700 uppercase">2. Pilih Data yang Ingin Dipulihkan (Restore):</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-amber-50/50 transition">
+                      <input type="checkbox" id="chkRestoreExams" checked class="rounded text-amber-600 focus:ring-amber-500" />
+                      <span class="text-[11px] font-semibold text-slate-800">Jadwal Ujian (<code>exams</code>)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-amber-50/50 transition">
+                      <input type="checkbox" id="chkRestoreUsers" checked class="rounded text-amber-600 focus:ring-amber-500" />
+                      <span class="text-[11px] font-semibold text-slate-800">Akun Peserta (<code>users</code>)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-amber-50/50 transition">
+                      <input type="checkbox" id="chkRestoreSettings" checked class="rounded text-amber-600 focus:ring-amber-500" />
+                      <span class="text-[11px] font-semibold text-slate-800">Status Ujian (<code>settings</code>)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-amber-50/50 transition">
+                      <input type="checkbox" id="chkRestoreAdmins" checked class="rounded text-amber-600 focus:ring-amber-500" />
+                      <span class="text-[11px] font-semibold text-slate-800">Daftar Admin (<code>admins</code>)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-amber-50/50 transition">
+                      <input type="checkbox" id="chkRestoreLogs" checked class="rounded text-amber-600 focus:ring-amber-500" />
+                      <span class="text-[11px] font-semibold text-slate-800">Log Pelanggaran (<code>cheat_logs</code>)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-lg border border-amber-200 bg-amber-50/60 cursor-pointer hover:bg-amber-100/60 transition">
+                      <input type="checkbox" id="chkRestoreResetStudentState" class="rounded text-amber-600 focus:ring-amber-500" />
+                      <span class="text-[11px] font-bold text-amber-900" title="Jika dicentang, seluruh peserta yang di-restore otomatis di-reset ke status IDLE (belum mulai) dan tidak terkunci">Reset Sesi Peserta ke IDLE</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-200 flex items-center gap-2">
+                <button type="button" id="btnExecuteRestore" onclick="window.executeRestoreData()" class="w-full py-2.5 px-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-lg shadow-md transition text-xs flex items-center justify-center text-center gap-1.5">
+                  <span>📤 Mulai Restore Data ke Server Firebase</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </div>
     </div>
   </main>
@@ -1093,6 +1290,20 @@
           badge.textContent = `${jCount} Jadwal • ${mCount} Murid`;
         }
       });
+      updateBackupStatsUI();
+    }
+
+    function updateBackupStatsUI() {
+      const elSched = document.getElementById("statBackupSchedules");
+      const elUsers = document.getElementById("statBackupUsers");
+      const elLogs = document.getElementById("statBackupLogs");
+      const elClassLabel = document.getElementById("backupActiveClassLabel");
+      const elBtnClass = document.getElementById("btnBackupCurrentClassText");
+      if (elSched) elSched.textContent = `${allSchedules.length} Total`;
+      if (elUsers) elUsers.textContent = `${allStudents.length} Total`;
+      if (elLogs) elLogs.textContent = `${allLogs.length} Total`;
+      if (elClassLabel && selectedAngkatan) elClassLabel.textContent = `Aktif: Kelas ${selectedAngkatan}`;
+      if (elBtnClass && selectedAngkatan) elBtnClass.textContent = `Kelas ${selectedAngkatan}`;
     }
 
     // ==========================================
@@ -1157,11 +1368,12 @@
       renderStudents();
       renderAccounts();
       renderLogs();
+      updateBackupStatsUI();
       window.loadClassSettings(true);
     };
 
     // ==========================================
-    // STEP 2: NAVIGASI 6 MENU UTAMA (BERWARNA MODERN & TEKS TENGAH)
+    // STEP 2: NAVIGASI 7 MENU UTAMA (BERWARNA MODERN & TEKS TENGAH)
     // ==========================================
     const menuTabColorThemes = {
       "jadwal": {
@@ -1187,12 +1399,25 @@
       "pelanggaran": {
         active: "tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-md bg-gradient-to-br from-rose-600 to-red-600 text-white border border-rose-500 ring-2 ring-rose-300",
         inactive: "tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-rose-50 to-red-100 text-rose-900 border border-rose-200 hover:from-rose-100 hover:to-red-200"
+      },
+      "backup": {
+        active: "tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-md bg-gradient-to-br from-emerald-600 to-green-600 text-white border border-emerald-500 ring-2 ring-emerald-300",
+        inactive: "tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-emerald-50 to-green-100 text-emerald-900 border border-emerald-200 hover:from-emerald-100 hover:to-green-200"
       }
+    };
+
+    window.openBackupMenu = () => {
+      if (!selectedAngkatan) {
+        window.selectAngkatan("X");
+      }
+      window.switchMenuTab("backup");
+      const sec = document.getElementById("tab-backup");
+      if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
     window.switchMenuTab = (tabName) => {
       activeMenuTab = tabName;
-      const tabs = ["jadwal", "tambah-jadwal", "reset", "status-ujian", "akun", "pelanggaran"];
+      const tabs = ["jadwal", "tambah-jadwal", "reset", "status-ujian", "akun", "pelanggaran", "backup"];
       tabs.forEach((t) => {
         const sec = document.getElementById(`tab-${t}`);
         const btn = document.getElementById(`tabBtn-${t}`);
@@ -1210,6 +1435,9 @@
         const batchSelect = document.getElementById("batchExamAngkatan");
         batchSelect.value = selectedAngkatan;
         batchSelect.disabled = true;
+      }
+      if (tabName === "backup") {
+        updateBackupStatsUI();
       }
     };
 
@@ -1299,6 +1527,7 @@
       const btnGoogleLogin = document.getElementById("btnGoogleLogin");
       const btnLogout = document.getElementById("btnLogout");
       const btnRefreshAll = document.getElementById("btnRefreshAll");
+      const btnHeaderBackup = document.getElementById("btnHeaderBackup");
       const loginGate = document.getElementById("loginGate");
       const dashboardContent = document.getElementById("dashboardContent");
 
@@ -1307,6 +1536,7 @@
         btnGoogleLogin.classList.add("hidden");
         btnLogout.classList.remove("hidden");
         btnRefreshAll.classList.remove("hidden");
+        if (btnHeaderBackup) btnHeaderBackup.classList.remove("hidden");
         loginGate.classList.add("hidden");
         dashboardContent.classList.remove("hidden");
 
@@ -1348,6 +1578,7 @@
         btnGoogleLogin.classList.remove("hidden");
         btnLogout.classList.add("hidden");
         btnRefreshAll.classList.add("hidden");
+        if (btnHeaderBackup) btnHeaderBackup.classList.add("hidden");
         loginGate.classList.remove("hidden");
         dashboardContent.classList.add("hidden");
         document.getElementById("nonAdminBanner").classList.add("hidden");
@@ -2409,6 +2640,457 @@
         showNotification("error", "Gagal Membersihkan Log", err.message);
       }
     });
+
+    // ==========================================
+    // MENU 7: BACKUP & RESTORE DATA (.JSON)
+    // ==========================================
+    let parsedRestorePayload = null;
+
+    function serializeFirestoreDoc(rawDoc) {
+      const clean = {};
+      for (const [k, v] of Object.entries(rawDoc || {})) {
+        if (v && typeof v.toMillis === "function") {
+          clean[k] = new Date(v.toMillis()).toISOString();
+        } else if (v && typeof v.seconds === "number") {
+          clean[k] = new Date(v.seconds * 1000).toISOString();
+        } else {
+          clean[k] = v;
+        }
+      }
+      return clean;
+    }
+
+    window.downloadBackupData = async (scope = "ALL") => {
+      if (!auth.currentUser) {
+        showNotification("error", "Belum Login", "Silakan login Google Proktor terlebih dahulu.");
+        return;
+      }
+
+      const incExams = document.getElementById("chkBackupExams").checked;
+      const incUsers = document.getElementById("chkBackupUsers").checked;
+      const incSettings = document.getElementById("chkBackupSettings").checked;
+      const incAdmins = document.getElementById("chkBackupAdmins").checked;
+      const incLogs = document.getElementById("chkBackupLogs").checked;
+
+      if (!incExams && !incUsers && !incSettings && !incAdmins && !incLogs) {
+        showNotification("warning", "Pilih Koleksi Data", "Centang minimal 1 jenis data yang ingin di-backup.");
+        return;
+      }
+
+      const targetClass = scope === "CURRENT_CLASS" ? (selectedAngkatan || "X") : "ALL";
+      startLoading(
+        "download-modal",
+        "Membuat File Backup (.JSON)...",
+        targetClass === "ALL" ? "Mengunduh seluruh data Kelas X, XI, dan XII" : `Mengunduh data khusus Kelas ${targetClass}`
+      );
+
+      try {
+        const backupData = {
+          meta: {
+            appName: "Manajemen Asesmen - SMKN 1 Mondokan",
+            version: "1.0",
+            scope: targetClass === "ALL" ? "SEMUA_KELAS" : `KELAS_${targetClass}`,
+            exportedAt: new Date().toISOString(),
+            exportedByEmail: auth.currentUser.email || "",
+            exportedByUid: auth.currentUser.uid || ""
+          },
+          collections: {}
+        };
+
+        if (incExams) {
+          const snap = await getDocs(collection(db, "exams"));
+          let docs = snap.docs.map((d) => serializeFirestoreDoc({ id: d.id, ...d.data() }));
+          if (targetClass !== "ALL") {
+            docs = docs.filter((item) => matchAngkatan(item, targetClass));
+          }
+          backupData.collections.exams = docs;
+        }
+
+        if (incUsers) {
+          const snap = await getDocs(collection(db, "users"));
+          let docs = snap.docs.map((d) => serializeFirestoreDoc({ uid: d.id, ...d.data() }));
+          if (targetClass !== "ALL") {
+            docs = docs.filter((item) => matchAngkatan(item, targetClass));
+          }
+          backupData.collections.users = docs;
+        }
+
+        if (incSettings) {
+          const settingIds = targetClass === "ALL"
+            ? ["global", "kelas_X", "kelas_XI", "kelas_XII"]
+            : [`kelas_${targetClass}`, "global"];
+          const settingsList = [];
+          for (const sId of settingIds) {
+            const sSnap = await getDoc(doc(db, "settings", sId));
+            if (sSnap.exists()) {
+              settingsList.push(serializeFirestoreDoc({ id: sSnap.id, ...sSnap.data() }));
+            }
+          }
+          backupData.collections.settings = settingsList;
+        }
+
+        if (incAdmins) {
+          const snap = await getDocs(collection(db, "admins"));
+          backupData.collections.admins = snap.docs.map((d) => serializeFirestoreDoc({ uid: d.id, ...d.data() }));
+        }
+
+        if (incLogs) {
+          const snap = await getDocs(collection(db, "cheat_logs"));
+          let docs = snap.docs.map((d) => serializeFirestoreDoc({ id: d.id, ...d.data() }));
+          if (targetClass !== "ALL") {
+            docs = docs.filter((item) => matchAngkatan(item.kelas, targetClass));
+          }
+          backupData.collections.cheat_logs = docs;
+        }
+
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+        const scopeSlug = targetClass === "ALL" ? "semua-kelas" : `kelas-${targetClass}`;
+        const fileName = `backup-asesmen-smkn1mondokan-${scopeSlug}-${stamp}.json`;
+
+        const jsonString = JSON.stringify(backupData, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 200);
+
+        stopLoading();
+        showNotification(
+          "success",
+          "Backup Berhasil Diunduh",
+          `File "${fileName}" telah disimpan ke perangkat Anda.`
+        );
+      } catch (err) {
+        stopLoading();
+        showNotification("error", "Gagal Membuat Backup", err.message);
+      }
+    };
+
+    window.handleRestoreFileChange = (event) => {
+      const file = event.target.files && event.target.files[0];
+      const previewBox = document.getElementById("restorePreviewBox");
+      if (!file) {
+        parsedRestorePayload = null;
+        previewBox.classList.add("hidden");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(String(e.target.result || "{}"));
+          const cols = parsed.collections || parsed;
+          if (!cols || typeof cols !== "object") {
+            throw new Error("Struktur file JSON tidak dikenali.");
+          }
+
+          const examsArr = Array.isArray(cols.exams) ? cols.exams : [];
+          const usersArr = Array.isArray(cols.users) ? cols.users : [];
+          const settingsArr = Array.isArray(cols.settings) ? cols.settings : [];
+          const adminsArr = Array.isArray(cols.admins) ? cols.admins : [];
+          const logsArr = Array.isArray(cols.cheat_logs) ? cols.cheat_logs : [];
+
+          parsedRestorePayload = {
+            meta: parsed.meta || {},
+            collections: {
+              exams: examsArr,
+              users: usersArr,
+              settings: settingsArr,
+              admins: adminsArr,
+              cheat_logs: logsArr
+            }
+          };
+
+          document.getElementById("previewCountExams").textContent = `${examsArr.length}`;
+          document.getElementById("previewCountUsers").textContent = `${usersArr.length}`;
+          document.getElementById("previewCountSettings").textContent = `${settingsArr.length}`;
+          document.getElementById("previewCountAdmins").textContent = `${adminsArr.length}`;
+          document.getElementById("previewCountLogs").textContent = `${logsArr.length}`;
+
+          const exportedAtStr = parsed.meta && parsed.meta.exportedAt
+            ? new Date(parsed.meta.exportedAt).toLocaleString("id-ID")
+            : "File Backup Valid";
+          document.getElementById("restorePreviewDate").textContent = exportedAtStr;
+          previewBox.classList.remove("hidden");
+
+          showNotification(
+            "success",
+            "File Backup Siap Dipulihkan",
+            `Terdeteksi ${examsArr.length} Jadwal, ${usersArr.length} Peserta, ${settingsArr.length} Status, ${adminsArr.length} Admin, dan ${logsArr.length} Log.`
+          );
+        } catch (err) {
+          parsedRestorePayload = null;
+          previewBox.classList.add("hidden");
+          showNotification("error", "File Backup Tidak Valid", "Pastikan Anda memilih file .JSON hasil Backup dari panel ini.");
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    function sanitizeValidId(rawId, prefix = "DOC") {
+      const cleaned = String(rawId || "").trim().replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 120);
+      return cleaned || `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    }
+
+    window.executeRestoreData = async () => {
+      if (!auth.currentUser) {
+        showNotification("error", "Belum Login", "Silakan login Google Proktor terlebih dahulu.");
+        return;
+      }
+
+      if (!parsedRestorePayload || !parsedRestorePayload.collections) {
+        showNotification("warning", "Pilih File Backup", "Silakan pilih file .JSON backup terlebih dahulu pada Langkah 1.");
+        return;
+      }
+
+      const resExams = document.getElementById("chkRestoreExams").checked;
+      const resUsers = document.getElementById("chkRestoreUsers").checked;
+      const resSettings = document.getElementById("chkRestoreSettings").checked;
+      const resAdmins = document.getElementById("chkRestoreAdmins").checked;
+      const resLogs = document.getElementById("chkRestoreLogs").checked;
+      const resetStudentToIdle = document.getElementById("chkRestoreResetStudentState").checked;
+
+      if (!resExams && !resUsers && !resSettings && !resAdmins && !resLogs) {
+        showNotification("warning", "Pilih Data Restore", "Centang minimal 1 jenis koleksi data yang ingin dipulihkan.");
+        return;
+      }
+
+      const cols = parsedRestorePayload.collections;
+      const totalToRestore =
+        (resExams ? cols.exams.length : 0) +
+        (resUsers ? cols.users.length : 0) +
+        (resSettings ? cols.settings.length : 0) +
+        (resAdmins ? cols.admins.length : 0) +
+        (resLogs ? cols.cheat_logs.length : 0);
+
+      if (totalToRestore === 0) {
+        showNotification("warning", "Data Kosong", "Tidak ada dokumen pada kategori yang Anda centang di dalam file backup tersebut.");
+        return;
+      }
+
+      const ok = await askConfirmation(
+        "Konfirmasi Restore Data ke Server",
+        `Anda akan memulihkan ${totalToRestore} dokumen data ke Cloud Firestore. Data dengan ID yang sama akan diperbarui, dan data yang belum ada akan ditambahkan kembali. Lanjutkan?`
+      );
+      if (!ok) return;
+
+      startLoading("upload", "Memulihkan Data Backup...", `Memproses ${totalToRestore} dokumen ke Cloud Firestore`);
+
+      let successCount = 0;
+      let failCount = 0;
+
+      try {
+        // 1. Restore Settings (/settings/{settingId})
+        if (resSettings && cols.settings.length > 0) {
+          for (const item of cols.settings) {
+            try {
+              const sId = sanitizeValidId(item.id, "kelas_X");
+              await setDoc(doc(db, "settings", sId), {
+                statusUjian: Boolean(item.statusUjian !== false),
+                eventName: String(item.eventName || "ASESMEN SUMATIF").trim().slice(0, 150),
+                eventClass: String(item.eventClass || "Semua Kelas").trim().slice(0, 50),
+                eventYear: String(item.eventYear || "Tahun Pelajaran 2025/2026").trim().slice(0, 50),
+                updatedAt: serverTimestamp()
+              });
+              successCount++;
+            } catch (e) {
+              console.warn("Gagal restore setting:", item, e);
+              failCount++;
+            }
+          }
+        }
+
+        // 2. Restore Exams (/exams/{examId})
+        if (resExams && cols.exams.length > 0) {
+          const existingExamIds = new Set(allSchedules.map((s) => s.id));
+          for (const item of cols.exams) {
+            try {
+              const examId = sanitizeValidId(item.id, "JDW");
+              const examDate = isoToDDMMYYYY(item.examDate || item.date || getTodayIsoDate());
+              const hariTanggal = String(item.hariTanggal || formatIndonesianDateFromDDMMYYYY(examDate)).trim().slice(0, 100);
+              const angkatanRaw = String(item.angkatan || "X").trim().toUpperCase();
+              const angkatan = ["X", "XI", "XII", "SEMUA", "ALL"].includes(angkatanRaw) ? angkatanRaw : "X";
+              const jurusanRaw = String(item.jurusan || "SEMUA").trim().toUpperCase();
+              const jurusan = ["TJKT", "TO", "TPFL", "BUSANA", "UMUM", "SEMUA", "ALL"].includes(jurusanRaw) ? jurusanRaw : "SEMUA";
+
+              const baseFields = {
+                mapel: String(item.mapel || item.subject || "Mata Pelajaran").trim().slice(0, 150),
+                examDate,
+                hariTanggal,
+                mulai: String(item.mulai || item.startTime || "07:30").trim().slice(0, 20),
+                selesai: String(item.selesai || item.endTime || "09:00").trim().slice(0, 20),
+                linkSoal: String(item.linkSoal || item.formUrl || "https://docs.google.com").trim().slice(0, 500),
+                angkatan,
+                jurusan,
+                isActive: item.isActive !== undefined ? Boolean(item.isActive) : true,
+                updatedAt: serverTimestamp()
+              };
+
+              if (existingExamIds.has(examId)) {
+                await updateDoc(doc(db, "exams", examId), baseFields);
+              } else {
+                await setDoc(doc(db, "exams", examId), {
+                  id: examId,
+                  ...baseFields,
+                  authorId: auth.currentUser.uid,
+                  createdAt: serverTimestamp()
+                });
+              }
+              successCount++;
+            } catch (e) {
+              console.warn("Gagal restore jadwal:", item, e);
+              failCount++;
+            }
+          }
+        }
+
+        // 3. Restore Users (/users/{userId})
+        if (resUsers && cols.users.length > 0) {
+          const existingUserIds = new Set(allStudents.map((u) => u.uid));
+          for (const item of cols.users) {
+            try {
+              const uid = sanitizeValidId(item.uid || item.id, "USR");
+              const kelas = String(item.kelas || "X UMUM").trim().toUpperCase().slice(0, 40);
+              const angkatanRaw = String(item.angkatan || detectAngkatanFromKelas(kelas, "X")).trim().toUpperCase();
+              const angkatan = ["X", "XI", "XII"].includes(angkatanRaw) ? angkatanRaw : "X";
+              const jurusanRaw = String(item.jurusan || detectJurusanFromKelas(kelas)).trim().toUpperCase();
+              const jurusan = ["TJKT", "TO", "TPFL", "BUSANA", "UMUM"].includes(jurusanRaw) ? jurusanRaw : "UMUM";
+
+              const validExamStatuses = ["idle", "login", "mengerjakan", "selesai", "terkunci"];
+              const rawStatus = resetStudentToIdle ? "idle" : String(item.examStatus || "idle").trim().toLowerCase();
+              const examStatus = validExamStatuses.includes(rawStatus) ? rawStatus : "idle";
+
+              const validStatusMengerjakan = ["0", "1", "2"];
+              const rawMengerjakan = resetStudentToIdle ? "0" : String(item.statusMengerjakan || "0").trim();
+              const statusMengerjakan = validStatusMengerjakan.includes(rawMengerjakan) ? rawMengerjakan : "0";
+
+              const userFields = {
+                username: String(item.username || uid).trim().slice(0, 100),
+                nama: String(item.nama || item.username || "PESERTA").trim().toUpperCase().slice(0, 120),
+                kelas,
+                angkatan,
+                jurusan,
+                isLoggedIn: resetStudentToIdle ? false : Boolean(item.isLoggedIn),
+                examStatus,
+                statusMengerjakan,
+                lastLoginTimestamp: serverTimestamp(),
+                updatedAt: serverTimestamp()
+              };
+
+              if (item.password && String(item.password).trim().length > 0) {
+                userFields.password = String(item.password).trim().slice(0, 100);
+              }
+              if (item.deviceId && String(item.deviceId).trim().length > 0) {
+                userFields.deviceId = String(item.deviceId).trim().slice(0, 128);
+              }
+
+              if (existingUserIds.has(uid)) {
+                await updateDoc(doc(db, "users", uid), userFields);
+              } else {
+                await setDoc(doc(db, "users", uid), {
+                  uid,
+                  ...userFields,
+                  createdAt: serverTimestamp()
+                });
+              }
+              successCount++;
+            } catch (e) {
+              console.warn("Gagal restore peserta:", item, e);
+              failCount++;
+            }
+          }
+        }
+
+        // 4. Restore Admins (/admins/{adminId})
+        if (resAdmins && cols.admins.length > 0) {
+          const existingSnap = await getDocs(collection(db, "admins"));
+          const existingAdminIds = new Set(existingSnap.docs.map((d) => d.id));
+          for (const item of cols.admins) {
+            try {
+              const adminUid = sanitizeValidId(item.uid || item.id, "ADM");
+              const role = item.role === "admin" ? "admin" : "proktor";
+              const name = String(item.name || "Proktor").trim().slice(0, 100);
+              if (existingAdminIds.has(adminUid)) {
+                await updateDoc(doc(db, "admins", adminUid), { name, role });
+              } else {
+                await setDoc(doc(db, "admins", adminUid), {
+                  uid: adminUid,
+                  name,
+                  role,
+                  createdAt: serverTimestamp()
+                });
+              }
+              successCount++;
+            } catch (e) {
+              console.warn("Gagal restore admin:", item, e);
+              failCount++;
+            }
+          }
+        }
+
+        // 5. Restore Cheat Logs (/cheat_logs/{logId})
+        if (resLogs && cols.cheat_logs.length > 0) {
+          const existingLogIds = new Set(allLogs.map((l) => l.id));
+          for (const item of cols.cheat_logs) {
+            try {
+              const logId = sanitizeValidId(item.id, "LOG");
+              const uid = sanitizeValidId(item.uid || auth.currentUser.uid, "USR");
+              const baseLog = {
+                username: String(item.username || "-").trim().slice(0, 100),
+                nama: String(item.nama || "PESERTA").trim().slice(0, 120),
+                kelas: String(item.kelas || "X UMUM").trim().slice(0, 40),
+                mapel: String(item.mapel || item.examId || "Ujian").trim().slice(0, 150),
+                deskripsi: String(item.deskripsi || item.type || "Pelanggaran Sesi Ujian").trim().slice(0, 300)
+              };
+
+              if (existingLogIds.has(logId)) {
+                await updateDoc(doc(db, "cheat_logs", logId), baseLog);
+              } else {
+                await setDoc(doc(db, "cheat_logs", logId), {
+                  uid,
+                  ...baseLog,
+                  createdAt: serverTimestamp()
+                });
+              }
+              successCount++;
+            } catch (e) {
+              console.warn("Gagal restore log:", item, e);
+              failCount++;
+            }
+          }
+        }
+
+        await window.loadClassSettings(true);
+        await window.loadAllClassSummary();
+        updateAngkatanCounters();
+
+        stopLoading();
+        if (failCount === 0) {
+          showNotification(
+            "success",
+            "Restore Data Selesai",
+            `Berhasil memulihkan ${successCount} dokumen ke server Cloud Firestore.`
+          );
+        } else {
+          showNotification(
+            "warning",
+            "Restore Selesai Sebagian",
+            `Berhasil: ${successCount} dokumen, Gagal: ${failCount} dokumen.`
+          );
+        }
+      } catch (err) {
+        stopLoading();
+        showNotification("error", "Gagal Restore Data", err.message);
+      }
+    };
   </script>
 </body>
 </html>
