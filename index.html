@@ -72,8 +72,31 @@
         <strong class="font-extrabold uppercase tracking-wide">⚠️ Akun Belum Memiliki Hak Akses Admin Proktor</strong>
         <p class="mt-0.5 text-red-100">
           Anda login sebagai <strong id="nonAdminEmailText"></strong> (UID: <code id="nonAdminUidText" class="bg-red-800 px-1 py-0.5 rounded select-all"></code>).
-          Silakan gunakan akun Google terverifikasi atau daftarkan UID di atas pada menu <strong>Event & Status Ujian &rarr; Daftar Admin Proktor</strong>.
+          Silakan gunakan akun <strong>penilaian.sekolah.2000@gmail.com</strong> atau klik tombol <strong>Pengaturan Rules &amp; Akses Firestore</strong> di kanan atas.
         </p>
+      </div>
+      <button type="button" onclick="window.openFirestoreSetupModal()" class="px-3 py-1.5 bg-white text-red-700 font-extrabold rounded-lg text-[10px] shadow shrink-0 hover:bg-red-50 transition">
+        ⚙️ Buka Panduan Rules Firestore
+      </button>
+    </div>
+  </div>
+
+  <!-- BANNER DIAGNOSTIK AKSES FIRESTORE DITOLAK (MUNCUL OTOMATIS JIKA RULES PROJECT BARU BELUM DIPASANG) -->
+  <div id="firestoreRulesBanner" class="hidden bg-gradient-to-r from-rose-700 via-red-700 to-amber-700 text-white px-4 py-2.5 shadow-md border-b border-rose-500">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-2 text-[11px]">
+      <div class="space-y-0.5">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 bg-white/20 rounded font-extrabold text-[10px] uppercase">Project: asesmen-cc85e</span>
+          <strong id="firestoreErrorBannerTitle" class="font-extrabold uppercase tracking-wide text-amber-200">⚠️ Akses Database Cloud Firestore Ditolak (Missing or Insufficient Permissions)</strong>
+        </div>
+        <p id="firestoreErrorBannerDesc" class="text-rose-100 leading-relaxed">
+          Project Firebase baru Anda (<code>asesmen-cc85e</code>) sudah terhubung ke Panel Proktor ini, namun <strong>Firestore Security Rules</strong> di Firebase Console Anda masih terkunci default (<code>allow read, write: if false;</code>). Klik tombol di samping untuk menyalin &amp; memasang Rules dalam 10 detik.
+        </p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" onclick="window.openFirestoreSetupModal()" class="px-3.5 py-2 bg-white text-rose-800 hover:bg-amber-50 font-extrabold rounded-lg text-[11px] shadow-md transition flex items-center justify-center text-center gap-1.5">
+          <span>📋 Salin &amp; Pasang Firestore Rules</span>
+        </button>
       </div>
     </div>
   </div>
@@ -86,13 +109,22 @@
           P
         </div>
         <div>
-          <h1 class="text-sm font-bold tracking-tight">Manajemen Asesmen</h1>
-          <p class="text-[10px] text-slate-400">SMKN 1 Mondokan</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm font-bold tracking-tight">Manajemen Asesmen</h1>
+            <button type="button" id="firestoreConnBadge" onclick="window.openFirestoreSetupModal()" class="px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-bold text-[10px] hover:bg-slate-700 transition flex items-center gap-1" title="Klik untuk melihat status koneksi & pengaturan Rules Cloud Firestore (asesmen-cc85e)">
+              <span id="firestoreConnDot" class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+              <span id="firestoreConnText">Cek Firestore (asesmen-cc85e)...</span>
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-400">SMKN 1 Mondokan &bull; Project ID: <code class="text-teal-400 font-mono">asesmen-cc85e</code></p>
         </div>
       </div>
 
       <!-- Auth Status & Action -->
       <div id="authSection" class="flex items-center flex-wrap gap-2">
+        <button type="button" onclick="window.openFirestoreSetupModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-amber-300 font-bold rounded-lg text-[10px] shadow-sm transition flex items-center justify-center text-center gap-1" title="Panduan Koneksi & Salin Kode Firestore Rules untuk Project asesmen-cc85e">
+          <span>⚙️ Rules Firestore</span>
+        </button>
         <button id="btnHeaderQuota" onclick="window.openQuotaMenu()" class="hidden px-3 py-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold rounded-lg text-[11px] shadow-sm transition flex items-center justify-center text-center gap-1.5" title="Pantau Penggunaan Kuota Harian Firebase Spark">
           <span>📊 Kuota Spark:</span>
           <span id="headerQuotaBadgeText" class="px-1.5 py-0.5 rounded bg-white/20 text-white font-extrabold text-[10px]">0%</span>
@@ -119,17 +151,53 @@
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-4 space-y-4">
 
     <!-- LOGIN GATE -->
-    <div id="loginGate" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 text-center max-w-md mx-auto my-6">
-      <div class="w-12 h-12 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3 text-lg font-bold shadow-inner">
-        🔒
+    <div id="loginGate" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 max-w-md mx-auto my-6 space-y-4">
+      <div class="text-center">
+        <div class="w-12 h-12 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3 text-lg font-bold shadow-inner">
+          🔒
+        </div>
+        <h2 class="text-base font-bold text-slate-900">Akses Khusus Proktor</h2>
+        <p class="text-[11px] text-slate-500 mt-1">
+          Terhubung ke Project Firebase: <code class="px-1.5 py-0.5 bg-teal-50 text-teal-800 border border-teal-200 rounded font-mono font-bold">asesmen-cc85e</code>
+        </p>
       </div>
-      <h2 class="text-base font-bold text-slate-900">Akses Khusus Proktor</h2>
-      <p class="text-[11px] text-slate-500 mt-1 mb-4">
-        Silakan masuk menggunakan akun Google Proktor untuk mengelola jadwal ujian, mereset status peserta, dan memantau log pelanggaran.
-      </p>
-      <button id="btnGateLogin" class="w-full py-2.5 px-4 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold rounded-lg shadow-md transition text-xs flex items-center justify-center text-center gap-2">
-        <span>Masuk dengan Akun Google</span>
-      </button>
+
+      <!-- Opsi 1: Login Google Popup -->
+      <div class="space-y-2">
+        <button type="button" id="btnGateLogin" class="w-full py-2.5 px-4 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold rounded-lg shadow-md transition text-xs flex items-center justify-center text-center gap-2">
+          <span>🔑 Masuk dengan Akun Google (Popup)</span>
+        </button>
+      </div>
+
+      <div class="relative flex py-1 items-center">
+        <div class="flex-grow border-t border-slate-200"></div>
+        <span class="flex-shrink mx-2.5 text-[10px] font-bold text-slate-400 uppercase">Atau Login Email &amp; Password Proktor</span>
+        <div class="flex-grow border-t border-slate-200"></div>
+      </div>
+
+      <!-- Opsi 2: Login Email & Password Proktor (Bebas Blokir Popup / Iframe) -->
+      <form id="proctorEmailLoginForm" class="space-y-2.5 text-left bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Email Proktor</label>
+          <input type="email" id="proctorLoginEmail" required value="penilaian.sekolah.2000@gmail.com" placeholder="penilaian.sekolah.2000@gmail.com" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white font-semibold focus:ring-2 focus:ring-teal-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Password Proktor (Min. 6 Karakter)</label>
+          <input type="password" id="proctorLoginPassword" required minlength="6" placeholder="Masukkan / buat password proktor..." class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-[11px] bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
+          <p class="text-[9px] text-slate-500 mt-1">
+            *Jika pertama kali login dengan Email/Password di project <code>asesmen-cc85e</code>, akun proktor akan otomatis diaktifkan.
+          </p>
+        </div>
+        <button type="submit" class="w-full py-2 px-4 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold rounded-lg shadow-sm transition text-xs flex items-center justify-center text-center gap-1.5">
+          <span>Masuk dengan Email &amp; Password</span>
+        </button>
+      </form>
+
+      <div class="pt-2 border-t border-slate-100 text-center">
+        <button type="button" onclick="window.openFirestoreSetupModal()" class="text-[11px] font-bold text-teal-700 hover:text-teal-900 underline">
+          Belum bisa akses Firestore di project baru? Klik di sini untuk Salin Firestore Rules
+        </button>
+      </div>
     </div>
 
     <!-- DASHBOARD CONTENT -->
@@ -208,10 +276,10 @@
               <span class="text-[13px] font-extrabold leading-tight text-center">Reset Peserta</span>
             </button>
             <button type="button" id="tabBtn-status-ujian" onclick="window.switchMenuTab('status-ujian')" class="tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-purple-50 to-fuchsia-100 text-purple-900 border border-purple-200 hover:from-purple-100 hover:to-fuchsia-200">
-              <span class="text-[13px] font-extrabold leading-tight text-center">Event & Status Ujian</span>
+              <span class="text-[13px] font-extrabold leading-tight text-center">Event & Status</span>
             </button>
             <button type="button" id="tabBtn-akun" onclick="window.switchMenuTab('akun')" class="tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-cyan-50 to-sky-100 text-sky-900 border border-sky-200 hover:from-cyan-100 hover:to-sky-200">
-              <span class="text-[13px] font-extrabold leading-tight text-center">Akun Peserta Ujian</span>
+              <span class="text-[13px] font-extrabold leading-tight text-center">Akun Murid</span>
             </button>
             <button type="button" id="tabBtn-pelanggaran" onclick="window.switchMenuTab('pelanggaran')" class="tab-btn flex flex-col items-center justify-center text-center p-3 rounded-xl font-bold text-[13px] transition-all shadow-sm bg-gradient-to-br from-rose-50 to-red-100 text-rose-900 border border-rose-200 hover:from-rose-100 hover:to-red-200">
               <span class="text-[13px] font-extrabold leading-tight text-center">Log Pelanggaran</span>
@@ -431,7 +499,7 @@
               <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-3">
                 <div>
                   <div class="flex items-center gap-2">
-                    <h3 class="text-sm font-bold text-slate-900">Pengaturan Event & Status Ujian</h3>
+                    <h3 class="text-sm font-bold text-slate-900">Pengaturan Event & Status</h3>
                     <span class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-extrabold text-[10px]" id="statusUjianClassBadge">Kelas X</span>
                   </div>
                   <p class="text-[10px] text-slate-500 mt-0.5">
@@ -556,7 +624,7 @@
             <div class="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
                 <div class="flex items-center gap-2">
-                  <h3 class="text-sm font-bold text-slate-900">Data Akun Peserta Ujian</h3>
+                  <h3 class="text-sm font-bold text-slate-900">Data Akun Murid</h3>
                   <span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-extrabold text-[10px]" id="akunClassBadge">Kelas X</span>
                 </div>
                 <p class="text-[10px] text-slate-500 mt-0.5">
@@ -744,7 +812,7 @@
                     </label>
                     <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-teal-50/50 transition">
                       <input type="checkbox" id="chkBackupSettings" checked class="rounded text-teal-600 focus:ring-teal-500" />
-                      <span class="text-[11px] font-semibold text-slate-800">Event &amp; Status Ujian (<code>settings</code>)</span>
+                      <span class="text-[11px] font-semibold text-slate-800">Event &amp; Status (<code>settings</code>)</span>
                     </label>
                     <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50/70 cursor-pointer hover:bg-teal-50/50 transition">
                       <input type="checkbox" id="chkBackupAdmins" checked class="rounded text-teal-600 focus:ring-teal-500" />
@@ -1271,20 +1339,135 @@
     </div>
   </div>
 
+  <!-- MODAL SETUP FIRESTORE RULES & DIAGNOSTIK PROJECT BARU (asesmen-cc85e) -->
+  <div id="firestoreSetupModal" class="hidden fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-2xl w-full p-5 space-y-3.5 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div>
+          <span class="px-2 py-0.5 bg-teal-100 text-teal-800 rounded font-extrabold text-[10px] uppercase">Project Baru: asesmen-cc85e</span>
+          <h3 class="text-sm font-extrabold text-slate-900 mt-1">Panduan Aktifkan Akses Cloud Firestore &amp; Login</h3>
+        </div>
+        <button type="button" onclick="window.closeFirestoreSetupModal()" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-700 font-bold flex items-center justify-center text-center transition">&times;</button>
+      </div>
+
+      <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-950 space-y-1.5 leading-relaxed">
+        <p class="font-extrabold text-amber-900">💡 Mengapa Panel Proktor belum bisa membaca/menulis ke Firestore?</p>
+        <p>
+          File <code>proktor-panel.html</code> ini <strong>sudah diubah ke konfigurasi project <code>asesmen-cc85e</code></strong>. Namun karena project <code>asesmen-cc85e</code> dibuat pada akun Google pribadi Anda (<code>penilaian.sekolah.2000@gmail.com</code>), sistem AI Studio tidak memiliki izin untuk mengubah <strong>Firestore Rules</strong> di akun Anda secara otomatis. Secara bawaan, database Firestore baru menolak semua akses (<code>allow read, write: if false;</code>) sampai Anda memasang Rules di bawah ini.
+        </p>
+      </div>
+
+      <!-- LANGKAH 1: PASANG FIRESTORE RULES -->
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <p class="text-xs font-extrabold text-slate-900">Langkah 1 (Wajib): Pasang Firestore Security Rules</p>
+            <p class="text-[10px] text-slate-600">Klik <strong>Salin Kode Rules</strong>, buka tab <strong>Rules</strong> di Firebase Console Anda, tempel (Paste), lalu klik <strong>Publish</strong>.</p>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" onclick="window.copyFirestoreRulesCode()" class="px-3 py-1.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold rounded-lg text-[10px] shadow-sm transition">
+              📋 Salin Kode Rules
+            </button>
+            <a href="https://console.firebase.google.com/project/asesmen-cc85e/firestore/databases/-default-/rules" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold rounded-lg text-[10px] shadow-sm transition">
+              🔗 Buka Rules di Firebase &nearr;
+            </a>
+          </div>
+        </div>
+        <textarea id="firestoreRulesCodeTextarea" readonly rows="7" class="w-full p-2.5 bg-slate-900 text-emerald-300 font-mono text-[10px] rounded-lg border border-slate-700 focus:outline-none select-all">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'penilaian.sekolah.2000@gmail.com' ||
+        request.auth.token.email == 'niotron.project@gmail.com' ||
+        request.auth.token.firebase.sign_in_provider == 'google.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /exams/{examId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create, update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAdmin();
+    }
+    match /cheat_logs/{logId} {
+      allow read: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || (isSignedIn() && request.auth.uid == adminId);
+    }
+  }
+}</textarea>
+      </div>
+
+      <!-- LANGKAH 2: AKTIFKAN SIGN-IN PROVIDER DI FIREBASE AUTH -->
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <p class="text-xs font-extrabold text-slate-900">Langkah 2 (Wajib): Aktifkan Metode Login (Google &amp; Email/Password)</p>
+          <p class="text-[10px] text-slate-600 mt-0.5">
+            Pastikan provider <strong>Google</strong> (untuk Proktor) dan <strong>Email/Password</strong> (untuk Murid &amp; Proktor) sudah berstatus <strong>Enabled</strong> di menu Authentication.
+          </p>
+        </div>
+        <a href="https://console.firebase.google.com/project/asesmen-cc85e/authentication/providers" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-bold rounded-lg text-[10px] shadow-sm transition shrink-0 text-center">
+          🔗 Buka Sign-in Method &nearr;
+        </a>
+      </div>
+
+      <!-- LANGKAH 3: AUTHORIZED DOMAINS -->
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <p class="text-xs font-extrabold text-slate-900">Langkah 3 (Jika Login Google Popup Ditolak Domain):</p>
+          <p class="text-[10px] text-slate-600 mt-0.5">
+            Tambahkan domain halaman ini (<code id="currentDomainCodeText" class="px-1.5 py-0.5 bg-slate-200 text-slate-800 rounded font-mono font-bold select-all">localhost</code>) ke <strong>Authentication &rarr; Settings &rarr; Authorized domains</strong>.
+          </p>
+        </div>
+        <a href="https://console.firebase.google.com/project/asesmen-cc85e/authentication/settings" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-[10px] shadow-sm transition shrink-0 text-center">
+          🔗 Authorized Domains &nearr;
+        </a>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+        <button type="button" onclick="window.testFirestoreConnectionNow()" class="px-4 py-1.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold rounded-lg text-[11px] shadow-sm transition">
+          ↻ Tes Ulang Koneksi Firestore Sekarang
+        </button>
+        <button type="button" onclick="window.closeFirestoreSetupModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-lg text-[11px] transition">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- FIREBASE MODULE SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
     import {
       initializeAuth,
+      getAuth,
       browserSessionPersistence,
       browserLocalPersistence,
       browserPopupRedirectResolver,
       GoogleAuthProvider,
       signInWithPopup,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
       signOut,
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
     import {
+      initializeFirestore,
       getFirestore,
       collection,
       doc,
@@ -1308,63 +1491,86 @@
       messagingSenderId: "754550438986",
       measurementId: "G-VRLHGJ1X7V"
     };
-    const firestoreDatabaseId = "(default)";
 
+    // Bersihkan token autentikasi kadaluarsa di sessionStorage/localStorage secara sinkron
+    // DAN pulihkan IndexedDB firebaseLocalStorageDb jika sebelumnya sempat terbuat kosong tanpa objectStore
     async function cleanupExpiredAuthTokens() {
       try {
-        const dbRequest = indexedDB.open("firebaseLocalStorageDb");
-        await new Promise((resolve) => {
-          dbRequest.onsuccess = () => {
-            try {
-              const idb = dbRequest.result;
-              if (!idb.objectStoreNames.contains("firebaseLocalStorage")) {
-                idb.close();
-                resolve();
-                return;
-              }
-              const tx = idb.transaction("firebaseLocalStorage", "readwrite");
-              const store = tx.objectStore("firebaseLocalStorage");
-              const getAllReq = store.getAll();
-              getAllReq.onsuccess = () => {
-                const items = getAllReq.result || [];
-                const now = Date.now();
-                for (const item of items) {
-                  const expTime = item?.value?.stsTokenManager?.expirationTime;
-                  if (expTime && expTime < now + 60000) {
-                    if (item.fbase_key) {
-                      store.delete(item.fbase_key);
-                    }
+        const now = Date.now();
+        const bufferMs = 5 * 60 * 1000;
+        for (const storage of [window.sessionStorage, window.localStorage]) {
+          if (!storage) continue;
+          for (let i = storage.length - 1; i >= 0; i--) {
+            const key = storage.key(i);
+            if (key && key.startsWith("firebase:authUser:")) {
+              const raw = storage.getItem(key);
+              if (raw) {
+                try {
+                  const parsed = JSON.parse(raw);
+                  const exp = Number(parsed?.stsTokenManager?.expirationTime || 0);
+                  if (!exp || exp <= now + bufferMs) {
+                    storage.removeItem(key);
                   }
+                } catch (_e) {
+                  storage.removeItem(key);
+                }
+              }
+            }
+          }
+        }
+
+        // Cek apakah firebaseLocalStorageDb pernah terbuat dalam kondisi rusak (tanpa objectStore firebaseLocalStorage)
+        // Hanya periksa jika indexedDB.databases() mendukung pengecekan tanpa membuat DB baru yang kosong
+        if (window.indexedDB && typeof window.indexedDB.databases === "function") {
+          const dbs = await window.indexedDB.databases();
+          const hasFbDb = (dbs || []).some((d) => d && d.name === "firebaseLocalStorageDb");
+          if (hasFbDb) {
+            await new Promise((resolve) => {
+              const req = window.indexedDB.open("firebaseLocalStorageDb");
+              req.onsuccess = () => {
+                const idb = req.result;
+                const hasStore = idb.objectStoreNames.contains("firebaseLocalStorage");
+                idb.close();
+                if (!hasStore) {
+                  const delReq = window.indexedDB.deleteDatabase("firebaseLocalStorageDb");
+                  delReq.onsuccess = () => resolve();
+                  delReq.onerror = () => resolve();
+                  delReq.onblocked = () => resolve();
+                } else {
+                  resolve();
                 }
               };
-              tx.oncomplete = () => {
-                idb.close();
-                resolve();
-              };
-              tx.onerror = () => {
-                idb.close();
-                resolve();
-              };
-            } catch (_e) {
-              resolve();
-            }
-          };
-          dbRequest.onerror = () => resolve();
-          dbRequest.onblocked = () => resolve();
-        });
+              req.onerror = () => resolve();
+              req.onblocked = () => resolve();
+            });
+          }
+        }
       } catch (_err) {
-        // Ignore IndexedDB cleanup errors
+        // Ignore storage cleanup errors
       }
     }
 
     await cleanupExpiredAuthTokens();
 
     const app = initializeApp(firebaseConfig);
-    const auth = initializeAuth(app, {
-      persistence: [browserSessionPersistence, browserLocalPersistence],
-      popupRedirectResolver: browserPopupRedirectResolver
-    });
-    const db = getFirestore(app, firestoreDatabaseId);
+    let auth;
+    try {
+      auth = initializeAuth(app, {
+        persistence: [browserSessionPersistence, browserLocalPersistence],
+        popupRedirectResolver: browserPopupRedirectResolver
+      });
+    } catch (_e) {
+      auth = getAuth(app);
+    }
+
+    let db;
+    try {
+      db = initializeFirestore(app, {
+        experimentalAutoDetectLongPolling: true
+      });
+    } catch (_e) {
+      db = getFirestore(app);
+    }
     const provider = new GoogleAuthProvider();
 
     // ==========================================
@@ -1985,7 +2191,122 @@
     };
 
     // ==========================================
-    // AUTHENTICATION HANDLERS
+    // DIAGNOSTIK KONEKSI & SETUP RULES FIRESTORE (asesmen-cc85e)
+    // ==========================================
+    const currentDomainEl = document.getElementById("currentDomainCodeText");
+    if (currentDomainEl) {
+      currentDomainEl.textContent = window.location.hostname || "localhost";
+    }
+
+    function setFirestoreConnectionUI(state, detailMsg = "") {
+      const badge = document.getElementById("firestoreConnBadge");
+      const dot = document.getElementById("firestoreConnDot");
+      const text = document.getElementById("firestoreConnText");
+      const rulesBanner = document.getElementById("firestoreRulesBanner");
+      const bannerTitle = document.getElementById("firestoreErrorBannerTitle");
+      const bannerDesc = document.getElementById("firestoreErrorBannerDesc");
+
+      if (!badge || !dot || !text) return;
+
+      if (state === "connected") {
+        badge.className = "px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 font-bold text-[10px] hover:bg-emerald-900 transition flex items-center gap-1";
+        dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400";
+        text.textContent = "Firestore Terhubung";
+        if (rulesBanner) rulesBanner.classList.add("hidden");
+      } else if (state === "permission-denied") {
+        badge.className = "px-2 py-0.5 rounded-full bg-rose-950 border border-rose-500 text-rose-200 font-extrabold text-[10px] hover:bg-rose-900 transition flex items-center gap-1 animate-pulse";
+        dot.className = "w-1.5 h-1.5 rounded-full bg-rose-400";
+        text.textContent = "Akses Ditolak (Klik Pasang Rules)";
+        if (rulesBanner) rulesBanner.classList.remove("hidden");
+        if (bannerTitle) {
+          bannerTitle.textContent = "⚠️ Akses Database Cloud Firestore Ditolak (Missing or Insufficient Permissions)";
+        }
+        if (bannerDesc) {
+          bannerDesc.innerHTML = `Project Firebase <code>asesmen-cc85e</code> menolak pembacaan/penulisan data karena <strong>Firestore Security Rules</strong> di Firebase Console belum dipasang atau masih terkunci default. Klik tombol <strong>Salin &amp; Pasang Firestore Rules</strong> di samping untuk mengaktifkannya.`;
+        }
+      } else if (state === "error") {
+        badge.className = "px-2 py-0.5 rounded-full bg-amber-950 border border-amber-500 text-amber-200 font-bold text-[10px] hover:bg-amber-900 transition flex items-center gap-1";
+        dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400";
+        text.textContent = "Kendala Koneksi Firestore";
+        if (rulesBanner) rulesBanner.classList.remove("hidden");
+        if (bannerTitle) {
+          bannerTitle.textContent = "⚠️ Kendala Koneksi ke Cloud Firestore (asesmen-cc85e)";
+        }
+        if (bannerDesc && detailMsg) {
+          bannerDesc.textContent = detailMsg;
+        }
+      } else {
+        badge.className = "px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 font-bold text-[10px] hover:bg-slate-700 transition flex items-center gap-1";
+        dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse";
+        text.textContent = "Menghubungkan Firestore...";
+      }
+    }
+
+    function handleFirestoreListenerError(collectionName, err) {
+      console.warn(`Listener ${collectionName} error:`, err);
+      const code = String(err?.code || "").toLowerCase();
+      const msg = String(err?.message || "");
+      if (code.includes("permission-denied") || msg.includes("Missing or insufficient permissions")) {
+        setFirestoreConnectionUI("permission-denied");
+      } else {
+        setFirestoreConnectionUI("error", `Gagal memuat koleksi "${collectionName}": ${msg}`);
+      }
+    }
+
+    window.openFirestoreSetupModal = () => {
+      const m = document.getElementById("firestoreSetupModal");
+      if (m) m.classList.remove("hidden");
+    };
+
+    window.closeFirestoreSetupModal = () => {
+      const m = document.getElementById("firestoreSetupModal");
+      if (m) m.classList.add("hidden");
+    };
+
+    window.copyFirestoreRulesCode = async () => {
+      const el = document.getElementById("firestoreRulesCodeTextarea");
+      if (!el) return;
+      try {
+        await navigator.clipboard.writeText(el.value);
+        showNotification("success", "Kode Rules Disalin!", "Silakan buka Firebase Console -> Firestore -> Rules, tempel (Paste), lalu klik Publish.");
+      } catch (_e) {
+        el.select();
+        document.execCommand("copy");
+        showNotification("success", "Kode Rules Disalin!", "Silakan tempel di tab Rules Firebase Console Anda.");
+      }
+    };
+
+    window.testFirestoreConnectionNow = async () => {
+      startLoading("download-modal", "Menguji Koneksi Firestore...", "Menghubungi project asesmen-cc85e");
+      try {
+        await getDoc(doc(db, "settings", "global"));
+        setFirestoreConnectionUI("connected");
+        if (auth.currentUser) {
+          initRealtimeListeners();
+          await window.loadAllClassSummary();
+        }
+        stopLoading();
+        window.closeFirestoreSetupModal();
+        showNotification("success", "Firestore Terhubung!", "Koneksi ke database Cloud Firestore (asesmen-cc85e) berjalan normal.");
+      } catch (err) {
+        stopLoading();
+        handleFirestoreListenerError("settings", err);
+        showNotification("error", "Akses Firestore Masih Ditolak", err.message || "Pastikan Anda sudah klik Publish pada tab Rules di Firebase Console.");
+      }
+    };
+
+    // Tes koneksi awal ke dokumen publik settings/global
+    (async () => {
+      try {
+        await fsGetDoc(doc(db, "settings", "global"));
+        setFirestoreConnectionUI("connected");
+      } catch (err) {
+        handleFirestoreListenerError("settings/global", err);
+      }
+    })();
+
+    // ==========================================
+    // AUTHENTICATION HANDLERS (GOOGLE POPUP + EMAIL/PASSWORD PROKTOR)
     // ==========================================
     const handleLogin = async () => {
       try {
@@ -1995,12 +2316,88 @@
         showNotification("success", "Login Berhasil", "Selamat datang di Panel Manajemen Asesmen.");
       } catch (err) {
         stopLoading();
-        showNotification("error", "Gagal Login Google", err.message || "Pastikan pop-up diizinkan.");
+        const code = String(err?.code || "");
+        if (code === "auth/unauthorized-domain") {
+          window.openFirestoreSetupModal();
+          showNotification(
+            "error",
+            "Domain Belum Diizinkan di Firebase",
+            `Tambahkan domain "${window.location.hostname}" di Firebase Console -> Authentication -> Settings -> Authorized domains, atau gunakan form Login Email & Password di bawah.`
+          );
+        } else if (code === "auth/operation-not-allowed") {
+          window.openFirestoreSetupModal();
+          showNotification(
+            "error",
+            "Google Login Belum Diaktifkan",
+            "Aktifkan provider Google di Firebase Console (asesmen-cc85e) -> Authentication -> Sign-in method."
+          );
+        } else {
+          showNotification("error", "Gagal Login Google", err.message || "Jika pop-up terblokir, silakan gunakan form Login Email & Password Proktor di bawah.");
+        }
       }
     };
 
     document.getElementById("btnGoogleLogin").addEventListener("click", handleLogin);
     document.getElementById("btnGateLogin").addEventListener("click", handleLogin);
+
+    const proctorEmailForm = document.getElementById("proctorEmailLoginForm");
+    if (proctorEmailForm) {
+      proctorEmailForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("proctorLoginEmail").value.trim().toLowerCase();
+        const password = document.getElementById("proctorLoginPassword").value;
+        if (!email || !password) return;
+
+        startLoading("upload", "Memverifikasi Akun Proktor...", `Masuk sebagai ${email}`);
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          stopLoading();
+          showNotification("success", "Login Proktor Berhasil", `Selamat datang, ${email}`);
+        } catch (signInErr) {
+          const code = String(signInErr?.code || "");
+          // Jika akun proktor belum terdaftar di Firebase Auth project baru, buatkan otomatis
+          if (
+            code === "auth/user-not-found" ||
+            code === "auth/invalid-credential" ||
+            code === "auth/invalid-login-credentials"
+          ) {
+            try {
+              const cred = await createUserWithEmailAndPassword(auth, email, password);
+              try {
+                await setDoc(doc(db, "admins", cred.user.uid), {
+                  uid: cred.user.uid,
+                  name: "Proktor Utama",
+                  role: "admin",
+                  createdAt: serverTimestamp()
+                });
+              } catch (_admErr) {}
+              stopLoading();
+              showNotification("success", "Akun Proktor Diaktifkan & Masuk", `Akun ${email} berhasil didaftarkan di project asesmen-cc85e.`);
+              return;
+            } catch (createErr) {
+              stopLoading();
+              const createCode = String(createErr?.code || "");
+              if (createCode === "auth/email-already-in-use") {
+                showNotification("error", "Password Salah", "Email sudah terdaftar tetapi password yang Anda masukkan tidak sesuai.");
+              } else if (createCode === "auth/operation-not-allowed") {
+                window.openFirestoreSetupModal();
+                showNotification(
+                  "error",
+                  "Provider Email/Password Belum Aktif",
+                  "Silakan aktifkan Email/Password di Firebase Console -> Authentication -> Sign-in method."
+                );
+              } else {
+                showNotification("error", "Gagal Login Proktor", createErr.message || signInErr.message);
+              }
+              return;
+            }
+          }
+          stopLoading();
+          showNotification("error", "Gagal Login Proktor", signInErr.message || "Periksa kembali email dan password Anda.");
+        }
+      });
+    }
+
     document.getElementById("btnLogout").addEventListener("click", async () => {
       startLoading("upload", "Keluar Sesi...", "Menutup sesi Proktor");
       await signOut(auth);
@@ -2043,8 +2440,10 @@
         try {
           const adminSnap = await getDoc(doc(db, "admins", user.uid));
           isRegisteredAdmin = adminSnap.exists();
-        } catch (_e) {
+          setFirestoreConnectionUI("connected");
+        } catch (err) {
           isRegisteredAdmin = false;
+          handleFirestoreListenerError("admins", err);
         }
 
         const nonAdminBanner = document.getElementById("nonAdminBanner");
@@ -2095,12 +2494,13 @@
       unsubSchedules = onSnapshot(
         collection(db, "exams"),
         (snap) => {
+          setFirestoreConnectionUI("connected");
           allSchedules = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
           updateAngkatanCounters();
           renderSchedules();
         },
         (err) => {
-          console.warn("Listener exams error:", err);
+          handleFirestoreListenerError("exams", err);
         }
       );
 
@@ -2108,13 +2508,14 @@
       unsubStudents = onSnapshot(
         collection(db, "users"),
         (snap) => {
+          setFirestoreConnectionUI("connected");
           allStudents = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
           updateAngkatanCounters();
           renderStudents();
           renderAccounts();
         },
         (err) => {
-          console.warn("Listener users error:", err);
+          handleFirestoreListenerError("users", err);
         }
       );
 
@@ -2122,6 +2523,7 @@
       unsubLogs = onSnapshot(
         collection(db, "cheat_logs"),
         (snap) => {
+          setFirestoreConnectionUI("connected");
           allLogs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
           allLogs.sort((a, b) => getTimestampMs(b.createdAt) - getTimestampMs(a.createdAt));
           renderLogs();
@@ -2131,7 +2533,7 @@
           }
         },
         (err) => {
-          console.warn("Listener cheat_logs error:", err);
+          handleFirestoreListenerError("cheat_logs", err);
         }
       );
 
@@ -2139,6 +2541,7 @@
       unsubAdmins = onSnapshot(
         collection(db, "admins"),
         (snap) => {
+          setFirestoreConnectionUI("connected");
           allAdmins = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
           renderAdmins(allAdmins);
           if (typeof window.updateQuotaMonitorUI === "function") {
@@ -2146,7 +2549,7 @@
           }
         },
         (err) => {
-          console.warn("Listener admins error:", err);
+          handleFirestoreListenerError("admins", err);
         }
       );
     }
@@ -2181,6 +2584,7 @@
           getDocs(collection(db, "users")),
           getDocs(collection(db, "cheat_logs"))
         ]);
+        setFirestoreConnectionUI("connected");
         allSchedules = schedSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
         allStudents = userSnap.docs.map((d) => ({ uid: d.id, ...d.data() }));
         allLogs = logSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -2200,6 +2604,7 @@
       } catch (err) {
         stopLoading();
         if (icon) icon.classList.remove("animate-spin");
+        handleFirestoreListenerError("refreshAllData", err);
         showNotification("error", "Gagal Menyegarkan Data", err.message);
       }
     };
@@ -2714,6 +3119,7 @@
       try {
         const docId = `kelas_${selectedAngkatan}`;
         const snap = await getDoc(doc(db, "settings", docId));
+        setFirestoreConnectionUI("connected");
         if (snap.exists()) {
           const data = snap.data();
           document.getElementById("settingAssessmentName").value = data.eventName || `ASESMEN SUMATIF KELAS ${selectedAngkatan}`;
@@ -2733,8 +3139,9 @@
           }
         }
         if (!silent) stopLoading();
-      } catch (_err) {
+      } catch (err) {
         if (!silent) stopLoading();
+        handleFirestoreListenerError("settings", err);
       }
     };
 
@@ -2758,8 +3165,8 @@
             eventEl.textContent = `Asesmen Kelas ${kls}`;
             if (yearEl) yearEl.textContent = "Tahun Pelajaran 2025/2026";
           }
-        } catch (_e) {
-          // ignore
+        } catch (err) {
+          handleFirestoreListenerError(`settings/kelas_${kls}`, err);
         }
       }
     };
@@ -2769,7 +3176,7 @@
       if (!selectedAngkatan) return;
 
       const eventName = document.getElementById("settingAssessmentName").value.trim().slice(0, 150);
-      const eventYear = (document.getElementById("settingEventYear").value || "Tahun Pelajaran 2025/2026").trim().slice(0, 100);
+      const eventYear = (document.getElementById("settingEventYear").value || "Tahun Pelajaran 2025/2026").trim().slice(0, 50);
       const statusMode = document.getElementById("settingAppStatus").value;
       const statusUjian = statusMode === "READY";
       const docId = `kelas_${selectedAngkatan}`;
@@ -2786,11 +3193,13 @@
       try {
         await setDoc(doc(db, "settings", docId), payload);
         await setDoc(doc(db, "settings", "global"), payload);
+        setFirestoreConnectionUI("connected");
         await window.loadAllClassSummary();
         stopLoading();
         showNotification("success", `Status Kelas ${selectedAngkatan} Disimpan`, `Event "${eventName}" (${eventYear}) diatur ke ${statusMode}.`);
       } catch (err) {
         stopLoading();
+        handleFirestoreListenerError("settings", err);
         showNotification("error", "Gagal Menyimpan Status Ujian", err.message);
       }
     });
